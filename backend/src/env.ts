@@ -30,6 +30,7 @@ const envSchema = z.object({
   NODE_ENV: z.string().optional(),
   PORT: z.coerce.number().int().positive().default(3000),
   DATABASE_URL: z.string().min(1),
+  DIRECT_URL: z.string().min(1).optional(),
   JWT_SECRET: z.string().min(32),
   CORS_ORIGINS: z
     .string()
@@ -43,10 +44,6 @@ const envSchema = z.object({
   ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().positive().default(15 * 60),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
   COOKIE_SECURE: booleanStringSchema,
-  // Google OAuth
-  GOOGLE_CLIENT_ID: optionalStringSchema,
-  GOOGLE_CLIENT_SECRET: optionalStringSchema,
-  GOOGLE_REDIRECT_URI: z.string().default('http://localhost:5173/auth/google/callback'),
   // SMTP Email
   SMTP_HOST: z.string().default('smtp.gmail.com'),
   SMTP_PORT: z.coerce.number().int().positive().default(587),

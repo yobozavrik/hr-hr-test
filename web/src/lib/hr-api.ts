@@ -142,25 +142,4 @@ export class HrApiClient {
   getDailyDigest() {
     return this.request('/api/hr/digest/daily')
   }
-
-  // Google
-  getGoogleAuthUrl(scope: string) {
-    return this.request(`/api/google/auth-url/${scope}`)
-  }
-
-  getGoogleStatus() {
-    return this.request('/api/google/status')
-  }
-
-  createCalendarEvent(data: { summary: string; description?: string; start: string; end: string }) {
-    return this.request('/api/google/calendar/events', { method: 'POST', body: data })
-  }
-
-  createSpreadsheet(title: string) {
-    return this.request('/api/google/sheets', { method: 'POST', body: { title } })
-  }
-
-  sendGmail(data: { to: string; subject: string; body: string }) {
-    return this.request('/api/google/gmail/send', { method: 'POST', body: data })
-  }
 }

@@ -17,7 +17,6 @@ model User {
   sessions     AuthSession[]
   
   // HR specific
-  googleTokens  GoogleToken?
   resumes       Resume[]
   vacancies     Vacancy[]
   tasks         Task[]
@@ -42,21 +41,6 @@ model AuthSession {
   @@index([userId], map: "auth_sessions_user_id_idx")
   @@index([expiresAt], map: "auth_sessions_expires_at_idx")
   @@map("auth_sessions")
-}
-
-// Google OAuth tokens for Calendar, Sheets, Gmail
-model GoogleToken {
-  id           String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
-  userId       String   @unique @db.Uuid @map("user_id")
-  accessToken  String   @map("access_token")
-  refreshToken String   @map("refresh_token")
-  expiresAt    DateTime @map("expires_at")
-  scope        String
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("google_tokens")
 }
 
 // Vacancies from job boards

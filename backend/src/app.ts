@@ -6,7 +6,6 @@ import type { DbClient } from './db'
 import type { AppEnv } from './env'
 import { createAuthRoutes } from './auth/routes'
 import { createHRRoutes } from './hr'
-import { createGoogleRoutes } from './google/routes'
 import { AuthService } from './auth/service'
 import { errorResponse, handleError } from './http/errors'
 import { createStorageServiceFromEnv, type StorageService } from './storage/service'
@@ -79,9 +78,6 @@ export function createApp({ env, prisma }: CreateAppOptions) {
 
   app.route('/api/auth', createAuthRoutes())
   app.route('/api/hr', createHRRoutes(prisma))
-  
-  const googleRoutes = createGoogleRoutes(prisma, env)
-  app.route('/api/google', googleRoutes.app)
 
   app.doc('/openapi.json', {
     openapi: '3.0.0',

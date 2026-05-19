@@ -16,7 +16,6 @@ const appNavItems = [
   { to: '/app/resumes', label: 'Резюме' },
   { to: '/app/matches', label: 'Матчи' },
   { to: '/app/tasks', label: 'Задачи' },
-  { to: '/app/integrations', label: 'Интеграции' },
 ]
 
 export function RootLayout() {

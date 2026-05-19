@@ -214,12 +214,4 @@ export function useSendEmail() {
   })
 }
 
-// Google
-export function useGoogleStatus() {
-  const client = useHrClient()
-  return useQuery({
-    queryKey: ['google', 'status'],
-    queryFn: () => client.getGoogleStatus(),
-    enabled: !!useAuth().accessToken,
-  })
-}
+
