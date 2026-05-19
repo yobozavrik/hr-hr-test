@@ -16,6 +16,12 @@
       "dest": "web/dist/$1"
     }
   ],
+  "crons": [
+    {
+      "path": "/api/cron/daily-digest",
+      "schedule": "0 8 * * *"
+    }
+  ],
   "env": {
     "NODE_ENV": "production"
   }
