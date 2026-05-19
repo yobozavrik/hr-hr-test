@@ -92,6 +92,7 @@ export class LinkedInScraper implements JobBoardScraper {
   }
 
   private generateMockVacancies(text: string): ScrapedItem[] {
+    const encoded = encodeURIComponent(text)
     return [
       {
         id: 'linkedin_mock_1',
@@ -102,7 +103,7 @@ export class LinkedInScraper implements JobBoardScraper {
         salaryTo: 7500,
         currency: 'USD',
         description: `We are looking for a remote Lead ${text} Architect to design complex platforms for our global enterprises. 6+ years of production experience required. Excellent benefits package.`,
-        url: 'https://www.linkedin.com/jobs/view/mock-lead-1',
+        url: `https://www.linkedin.com/jobs/search/?keywords=${encoded}`,
         source: 'linkedin',
       },
       {
@@ -114,13 +115,14 @@ export class LinkedInScraper implements JobBoardScraper {
         salaryTo: 8000,
         currency: 'USD',
         description: `Grammarly is looking for a Senior ${text} to join our core product team. You will lead development of new features that will impact over 30 million active users.`,
-        url: 'https://www.linkedin.com/jobs/view/mock-senior-2',
+        url: `https://www.linkedin.com/jobs/search/?keywords=${encoded}`,
         source: 'linkedin',
       },
     ]
   }
 
   private generateMockResumes(text: string): ScrapedItem[] {
+    const encoded = encodeURIComponent(text)
     return [
       {
         id: 'linkedin_resume_mock_1',
@@ -128,7 +130,7 @@ export class LinkedInScraper implements JobBoardScraper {
         candidateName: 'Dmitry Kovalenko',
         location: 'Kyiv, Ukraine',
         description: `Experienced professional specializing in ${text}. Designed enterprise-scale web projects, managed dev teams of 12+ developers, reduced time-to-market by 35%. Tech Stack: Node.js, React, GCP.`,
-        url: 'https://www.linkedin.com/in/mock-dmitry-1',
+        url: `https://www.linkedin.com/search/results/people/?keywords=${encoded}`,
         source: 'linkedin',
       },
       {
@@ -137,7 +139,7 @@ export class LinkedInScraper implements JobBoardScraper {
         candidateName: 'Elena Petrova',
         location: 'Lviv, Ukraine',
         description: `Passionate Team Lead and ${text} developer. Expert in building performant frontend architectures. Active open source contributor. Focused on UX, clean code, and automated testing.`,
-        url: 'https://www.linkedin.com/in/mock-elena-2',
+        url: `https://www.linkedin.com/search/results/people/?keywords=${encoded}`,
         source: 'linkedin',
       },
     ]

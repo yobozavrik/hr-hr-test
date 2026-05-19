@@ -68,6 +68,7 @@ const envSchema = z.object({
 }).superRefine((env, ctx) => {
   validateJwtSecret(env, ctx)
   validateCorsOrigins(env, ctx)
+  validateSpacesConfig(env, ctx)
 })
 
 export type AppEnv = z.infer<typeof envSchema>
@@ -159,4 +160,34 @@ function validateCorsOrigins(env: z.infer<typeof envSchema>, ctx: z.RefinementCt
   }
 }
 
+function validateSpacesConfig(env: z.infer<typeof envSchema>, ctx: z.RefinementCtx) {
+  const spacesKeys = [
+    'SPACES_REGION',
+    'SPACES_BUCKET',
+    'SPACES_ENDPOINT',
+    'SPACES_CDN_BASE_URL',
+    'SPACES_ACCESS_KEY_ID',
+    'SPACES_SECRET_ACCESS_KEY',
+  ] as const
 
+  const hasAnySpaces = spacesKeys.some((key) => env[key] !== undefined)
+  if (!hasAnySpaces) return
+
+  const coreKeys = [
+    'SPACES_REGION',
+    'SPACES_BUCKET',
+    'SPACES_ENDPOINT',
+    'SPACES_ACCESS_KEY_ID',
+    'SPACES_SECRET_ACCESS_KEY',
+  ] as const
+
+  for (const key of coreKeys) {
+    if (env[key] === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        path: [key],
+        message: `${key} must be specified when storage/Spaces configuration is enabled`,
+      })
+    }
+  }
+}

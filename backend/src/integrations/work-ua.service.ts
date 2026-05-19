@@ -65,65 +65,83 @@ export class WorkUaScraper implements JobBoardScraper {
       const chunk = parts[i]
       
       // Extract URL and Title
-      const urlTitleMatch = chunk.match(/href="([^"]+\/jobs\/(\d+)\/[^"]*)"[^>]*>([\s\S]*?)<\/a>/)
+      const urlTitleMatch = chunk.match(/href="([^"]*?\/jobs\/(\d+)\/[^"]*)"[^>]*>([\s\S]*?)<\/a>/)
       if (!urlTitleMatch) continue
 
       let url = urlTitleMatch[1]
       const id = urlTitleMatch[2]
-      let title = urlTitleMatch[3].replace(/<[^>]*>/g, '').trim()
+      const title = urlTitleMatch[3].replace(/<[^>]*>/g, '').trim()
 
       if (!url.startsWith('http')) {
         url = `${this.baseUrl}${url}`
       }
 
-      // Extract Company
-      let company = ''
-      const companyMatch = chunk.match(/(?:<span><b>|class="strong">)([^<]+)(?:<\/b><\/span>|<\/span>)/)
-      if (companyMatch) {
-        company = companyMatch[1].trim()
-      } else {
-        const altCompanyMatch = chunk.match(/<span>([^<]+)<\/span>/)
-        if (altCompanyMatch) company = altCompanyMatch[1].trim()
+      // Extract Company and Location (mt-xs)
+      let company = 'Роботодавець'
+      let location = 'Україна'
+      const mtXsMatch = chunk.match(/class="mt-xs">([\s\S]*?)<\/div>/)
+      if (mtXsMatch) {
+        const mtXsContent = mtXsMatch[1].trim()
+        const compMatch = mtXsContent.match(/class="strong-600">([^<]+)<\/span>/)
+        if (compMatch) {
+          company = compMatch[1].trim()
+        }
+        const locMatch = mtXsContent.match(/<span class="?">([^<]+)<\/span>\s*$/)
+        if (locMatch) {
+          location = locMatch[1].trim()
+        }
       }
 
-      // Extract Salary
+      // Extract Salary from first strong-600 span (if it contains numbers and currency indicator)
       let salaryFrom: number | null = null
       let salaryTo: number | null = null
       let currency: string | null = 'UAH'
 
-      const salaryMatch = chunk.match(/(?:<b class="text-light">|<b>)([\d\s –-]+)(?:\s*)(грн|UAH|\$|€|usd|eur)/i)
-      if (salaryMatch) {
-        const salStr = salaryMatch[1].replace(/[\s ]/g, '') // remove spaces
-        const cur = salaryMatch[2]
+      const spanMatch = chunk.match(/<span class="strong-600">([\s\S]*?)<\/span>/)
+      if (spanMatch) {
+        const rawText = spanMatch[1]
+        const decoded = rawText
+          .replace(/&nbsp;/gi, ' ')
+          .replace(/&thinsp;/gi, ' ')
+          .replace(/&#8239;/gi, ' ')
+          .replace(/&#160;/gi, ' ')
         
-        if (cur.includes('$') || cur.toLowerCase() === 'usd') {
-          currency = 'USD'
-        } else if (cur.includes('€') || cur.toLowerCase() === 'eur') {
-          currency = 'EUR'
-        }
+        const hasDigits = /\d/.test(decoded)
+        const hasCurrency = /(грн|UAH|\$|€|usd|eur)/i.test(decoded)
+        
+        if (hasDigits && hasCurrency) {
+          const cleanText = decoded.replace(/\s+/g, '')
+          if (cleanText.includes('–') || cleanText.includes('-')) {
+            const salaryParts = cleanText.split(/[–-]/)
+            const fromStr = salaryParts[0].replace(/\D/g, '')
+            const toStr = salaryParts[1].replace(/\D/g, '')
+            salaryFrom = fromStr ? parseInt(fromStr, 10) : null
+            salaryTo = toStr ? parseInt(toStr, 10) : null
+          } else {
+            const valStr = cleanText.replace(/\D/g, '')
+            salaryFrom = valStr ? parseInt(valStr, 10) : null
+            salaryTo = salaryFrom
+          }
 
-        if (salStr.includes('–') || salStr.includes('-')) {
-          const parts = salStr.split(/[–-]/)
-          salaryFrom = parseInt(parts[0], 10) || null
-          salaryTo = parseInt(parts[1], 10) || null
-        } else {
-          salaryFrom = parseInt(salStr, 10) || null
-          salaryTo = salaryFrom
+          if (decoded.includes('$') || decoded.toLowerCase().includes('usd')) {
+            currency = 'USD'
+          } else if (decoded.includes('€') || decoded.toLowerCase().includes('eur')) {
+            currency = 'EUR'
+          }
         }
       }
 
       // Extract description snippet
       let description = ''
-      const descMatch = chunk.match(/<p class="[^"]*text-muted[^"]*"[^>]*>([\s\S]*?)<\/p>/)
+      const descMatch = chunk.match(/<p class="ellipsis[^>]*>([\s\S]*?)<\/p>/)
       if (descMatch) {
-        description = descMatch[1].replace(/<[^>]*>/g, '').trim()
-      }
-
-      // Location
-      let location = 'Україна'
-      const locMatch = chunk.match(/(?:<span>·\s*|·\s*)([А-Яа-яA-Za-z\s-]+)(?:\s*·|\s*<\/span>)/)
-      if (locMatch) {
-        location = locMatch[1].trim()
+        description = descMatch[1]
+          .replace(/&nbsp;/g, ' ')
+          .replace(/&thinsp;/g, ' ')
+          .replace(/&#8239;/g, ' ')
+          .replace(/&hellip;/g, '...')
+          .replace(/\s+/g, ' ')
+          .trim()
       }
 
       items.push({
@@ -155,12 +173,13 @@ export class WorkUaScraper implements JobBoardScraper {
       const chunk = parts[i]
       
       // Extract URL and Name
-      const urlNameMatch = chunk.match(/href="([^"]+\/resumes\/(\d+)\/[^"]*)"[^>]*>([\s\S]*?)<\/a>/)
+      const urlNameMatch = chunk.match(/href="([^"]*?\/resumes\/(\d+)\/[^"]*)"[^>]*>([\s\S]*?)<\/a>/)
       if (!urlNameMatch) continue
 
       let url = urlNameMatch[1]
       const id = urlNameMatch[2]
-      let candidateName = urlNameMatch[3].replace(/<[^>]*>/g, '').trim()
+      let candidateName = 'Шукач'
+      let location = 'Україна'
 
       if (!url.startsWith('http')) {
         url = `${this.baseUrl}${url}`
@@ -170,8 +189,22 @@ export class WorkUaScraper implements JobBoardScraper {
       let title = 'Шукач'
       const titleMatch = chunk.match(/<h2[^>]*>([\s\S]*?)<\/h2>/)
       if (titleMatch) {
-        const cleanH2 = titleMatch[1].replace(/<[^>]*>/g, '').trim()
-        title = cleanH2.replace(candidateName, '').trim().replace(/^,/, '').trim() || cleanH2
+        title = titleMatch[1].replace(/<[^>]*>/g, '').trim()
+      }
+
+      // Extract Candidate Name & Location
+      const infoMatch = chunk.match(/<span class="strong-600">([^<]+)<\/span>,([\s\S]*?)<\/p>/)
+      if (infoMatch) {
+        candidateName = infoMatch[1].trim()
+        const remainingSpans = infoMatch[2]
+        const spans = [...remainingSpans.matchAll(/<span>([^<]+)<\/span>/g)].map(m => m[1].trim())
+        if (spans.length > 0) {
+          location = spans[spans.length - 1]
+            .replace(/&nbsp;/gi, ' ')
+            .replace(/&thinsp;/gi, ' ')
+            .replace(/&#8239;/gi, ' ')
+            .replace(/&#160;/gi, ' ')
+        }
       }
 
       // Extract Salary
@@ -191,16 +224,19 @@ export class WorkUaScraper implements JobBoardScraper {
 
       // Extract Info / Description
       let description = ''
-      const descMatch = chunk.match(/<p class="[^"]*text-muted[^"]*"[^>]*>([\s\S]*?)<\/p>/)
+      const descMatch = chunk.match(/<p class="mb-0 overflow wordwrap[^>]*>([\s\S]*?)<\/p>/)
       if (descMatch) {
-        description = descMatch[1].replace(/<[^>]*>/g, '').trim()
-      }
-
-      // Location
-      let location = 'Україна'
-      const locMatch = chunk.match(/(?:·\s*)([А-Яа-яA-Za-z\s-]+)(?:\s*·|\s*<\/p>|\s*·\s*<b>)/)
-      if (locMatch) {
-        location = locMatch[1].trim()
+        description = descMatch[1]
+          .replace(/&nbsp;/gi, ' ')
+          .replace(/&thinsp;/gi, ' ')
+          .replace(/&#8239;/gi, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+      } else {
+        const fallbackDesc = chunk.match(/<p class="mb-0[^>]*>([\s\S]*?)<\/p>/)
+        if (fallbackDesc) {
+          description = fallbackDesc[1].replace(/<[^>]*>/g, '').trim()
+        }
       }
 
       items.push({

@@ -53,13 +53,13 @@ export class RobotaUaScraper implements JobBoardScraper {
     // Robota.ua resume search requires corporate auth usually.
     // We will attempt to search candidate search HTML pages or fallback to mocks if blocked.
     const page = params.page ? params.page + 1 : 1
-    const searchUrl = `${this.baseUrl}/ru/candidates/${encodeURIComponent(params.text)}/ukraine?page=${page}`
+    const searchUrl = `${this.baseUrl}/candidates/${encodeURIComponent(params.text)}/ukraine?page=${page}`
 
     try {
       const response = await fetch(searchUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,uk;q=0.6',
+          'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
         }
       })
 
@@ -68,7 +68,8 @@ export class RobotaUaScraper implements JobBoardScraper {
       }
 
       const html = await response.text()
-      return this.parseResumeHtml(html)
+      const items = this.parseResumeHtml(html)
+      return items.length > 0 ? items : this.generateMockResumes(params.text)
     } catch (error) {
       console.error('Error fetching Robota.ua resumes:', error)
       return this.generateMockResumes(params.text)
@@ -184,6 +185,7 @@ export class RobotaUaScraper implements JobBoardScraper {
 
   private generateMockVacancies(text: string): ScrapedItem[] {
     // Generate high quality mocks as fallback if site blocks/CORS errors happen
+    const encoded = encodeURIComponent(text)
     return [
       {
         id: `robota_mock_1`,
@@ -194,7 +196,7 @@ export class RobotaUaScraper implements JobBoardScraper {
         salaryTo: 110000,
         currency: 'UAH',
         description: `Шукаємо досвідченого ${text} в нашу технічну команду для роботи над високонавантаженими сервісами логістики. Потрібен досвід роботи від 4-х років.`,
-        url: 'https://robota.ua/ru/company/nova-poshta/vacancy/mock1',
+        url: `https://robota.ua/zapyt/${encoded}/ukraine`,
         source: 'robota.ua'
       },
       {
@@ -206,13 +208,14 @@ export class RobotaUaScraper implements JobBoardScraper {
         salaryTo: 3500,
         currency: 'USD',
         description: `Ми розширюємо проєкт великого ритейл-клієнта з США. Шукаємо розробника з розмовною англійською та стеком навколо ${text}.`,
-        url: 'https://robota.ua/ru/company/softserve/vacancy/mock2',
+        url: `https://robota.ua/zapyt/${encoded}/ukraine`,
         source: 'robota.ua'
       }
     ]
   }
 
   private generateMockResumes(text: string): ScrapedItem[] {
+    const encoded = encodeURIComponent(text)
     return [
       {
         id: `robota_resume_mock_1`,
@@ -222,7 +225,7 @@ export class RobotaUaScraper implements JobBoardScraper {
         salaryFrom: 4000,
         currency: 'USD',
         description: `Досвід роботи більше 6 років. Успішний досвід проектування систем за методологією ${text}. Знання патернів програмування, архітектурних стилей та сучасних практик.`,
-        url: 'https://robota.ua/ru/candidate/mock1',
+        url: `https://robota.ua/candidates/${encoded}/ukraine`,
         source: 'robota.ua'
       },
       {
@@ -233,7 +236,7 @@ export class RobotaUaScraper implements JobBoardScraper {
         salaryFrom: 800,
         currency: 'USD',
         description: `Закінчила профільні курси за напрямком ${text}. Володію HTML/CSS/JS, базовими принципами роботи з фреймворками. Готова вчитися та розвиватися.`,
-        url: 'https://robota.ua/ru/candidate/mock2',
+        url: `https://robota.ua/candidates/${encoded}/ukraine`,
         source: 'robota.ua'
       }
     ]
