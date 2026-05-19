@@ -43,6 +43,21 @@ const envSchema = z.object({
   ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().positive().default(15 * 60),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
   COOKIE_SECURE: booleanStringSchema,
+  // Google OAuth
+  GOOGLE_CLIENT_ID: optionalStringSchema,
+  GOOGLE_CLIENT_SECRET: optionalStringSchema,
+  GOOGLE_REDIRECT_URI: z.string().default('http://localhost:5173/auth/google/callback'),
+  // SMTP Email
+  SMTP_HOST: z.string().default('smtp.gmail.com'),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_USER: optionalStringSchema,
+  SMTP_PASS: optionalStringSchema,
+  // AI
+  OPENAI_API_KEY: optionalStringSchema,
+  // Telegram
+  TELEGRAM_BOT_TOKEN: optionalStringSchema,
+  TELEGRAM_CHAT_ID: optionalStringSchema,
+  // Storage (optional)
   SPACES_REGION: optionalStringSchema,
   SPACES_BUCKET: optionalStringSchema,
   SPACES_ENDPOINT: optionalUrlSchema,
@@ -56,7 +71,6 @@ const envSchema = z.object({
 }).superRefine((env, ctx) => {
   validateJwtSecret(env, ctx)
   validateCorsOrigins(env, ctx)
-  validateStorageEnv(env, ctx)
 })
 
 export type AppEnv = z.infer<typeof envSchema>
@@ -148,26 +162,4 @@ function validateCorsOrigins(env: z.infer<typeof envSchema>, ctx: z.RefinementCt
   }
 }
 
-function validateStorageEnv(env: z.infer<typeof envSchema>, ctx: z.RefinementCtx) {
-  const requiredStorageKeys = [
-    'SPACES_REGION',
-    'SPACES_BUCKET',
-    'SPACES_ENDPOINT',
-    'SPACES_ACCESS_KEY_ID',
-    'SPACES_SECRET_ACCESS_KEY',
-  ] as const
-  const storageConfigured =
-    requiredStorageKeys.some((key) => env[key] !== undefined) || env.SPACES_CDN_BASE_URL !== undefined
 
-  if (!storageConfigured) return
-
-  for (const key of requiredStorageKeys) {
-    if (env[key] === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        path: [key],
-        message: `${key} is required when DigitalOcean Spaces storage is configured`,
-      })
-    }
-  }
-}

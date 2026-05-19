@@ -1,4 +1,5 @@
 import { createBackendRuntime, type BackendRuntime } from './runtime'
+import { HRService } from './hr/service'
 
 type CronTask = (runtime: BackendRuntime) => Promise<void>
 
@@ -9,6 +10,26 @@ const cronTasks = {
   'db:ping': async ({ prisma }) => {
     await prisma.$queryRaw`SELECT 1`
     console.log('Cron db:ping task completed.')
+  },
+  'daily:digest': async ({ prisma }) => {
+    const service = new HRService(prisma)
+    const users = await prisma.user.findMany()
+    
+    for (const user of users) {
+      try {
+        const digest = await service.getDailyDigest(user.id)
+        console.log(`Daily digest for ${user.email}:`, {
+          newVacancies: digest.newVacancies,
+          newResumes: digest.newResumes,
+          newMatches: digest.newMatches,
+          upcomingTasks: digest.upcomingTasks.length,
+        })
+      } catch (error) {
+        console.error(`Failed to generate digest for ${user.email}:`, error)
+      }
+    }
+    
+    console.log('Cron daily:digest task completed.')
   },
 } satisfies Record<string, CronTask>
 
