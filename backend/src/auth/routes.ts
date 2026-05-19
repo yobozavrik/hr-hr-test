@@ -15,6 +15,7 @@ import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 import type { AppEnv } from '../env'
 import { AppError, errorResponse } from '../http/errors'
 import type { AuthService } from './service'
+import type { Variables } from '../app'
 
 const refreshCookieName = 'web_app_demo_refresh'
 
@@ -178,6 +179,26 @@ const logoutRoute = createRoute({
     },
   },
 })
+
+export async function requireAuth(c: any, next: any) {
+  const auth = c.get('authService')
+  const token = bearerToken(c)
+  
+  if (!token) {
+    return c.json(errorResponse('UNAUTHORIZED', 'Access token required'), 401)
+  }
+
+  try {
+    const user = await auth.getMe(token)
+    if (!user) {
+      return c.json(errorResponse('UNAUTHORIZED', 'Invalid access token'), 401)
+    }
+    c.set('user', user)
+    await next()
+  } catch {
+    return c.json(errorResponse('UNAUTHORIZED', 'Invalid access token'), 401)
+  }
+}
 
 export function createAuthRoutes() {
   const routes = new OpenAPIHono<AuthRouteEnv>({

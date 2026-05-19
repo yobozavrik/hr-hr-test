@@ -15,6 +15,9 @@ const env: AppEnv = {
   SPACES_UPLOAD_URL_TTL_SECONDS: 900,
   SPACES_DOWNLOAD_URL_TTL_SECONDS: 300,
   SPACES_PUBLIC_CACHE_CONTROL: 'public, max-age=31536000, immutable',
+  GOOGLE_REDIRECT_URI: 'http://localhost:5173/auth/google/callback',
+  SMTP_HOST: 'smtp.gmail.com',
+  SMTP_PORT: 587,
 }
 
 describe('access tokens', () => {

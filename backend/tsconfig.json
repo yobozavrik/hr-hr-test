@@ -12,6 +12,7 @@
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.d.ts",
     "prisma.config.ts"
   ]
 }

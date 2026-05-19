@@ -11,11 +11,16 @@ import { AuthService } from './auth/service'
 import { errorResponse, handleError } from './http/errors'
 import { createStorageServiceFromEnv, type StorageService } from './storage/service'
 
+export type Variables = {
+  user: { id: string; email: string }
+}
+
 type AppBindings = {
   Variables: {
     authService: AuthService
     env: AppEnv
     storageService: StorageService | null
+    user: { id: string; email: string }
   }
 }
 

@@ -1,5 +1,5 @@
 import { google } from 'googleapis'
-import type { PrismaClient } from '../generated/prisma'
+import type { PrismaClient } from '../generated/prisma/client'
 
 export class GoogleService {
   private oauth2Client: any

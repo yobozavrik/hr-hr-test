@@ -55,9 +55,9 @@ export function AuthForm() {
   return (
     <Card className="w-full" aria-label="Authentication">
       <CardHeader>
-        <CardTitle>Account access</CardTitle>
+        <CardTitle>Доступ к аккаунту</CardTitle>
         <CardDescription>
-          Create an account or continue with an existing session.
+          Создайте аккаунт или войдите в существующий.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -71,8 +71,8 @@ export function AuthForm() {
           className="mb-6"
         >
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="register">Register</TabsTrigger>
-            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="register">Регистрация</TabsTrigger>
+            <TabsTrigger value="login">Вход</TabsTrigger>
           </TabsList>
 
           <TabsContent value="register" forceMount hidden={mode !== 'register'} className="mt-6">
@@ -141,7 +141,7 @@ function RegisterForm({
           name="displayName"
           children={(field) => (
             <Field data-invalid={hasErrors(fieldErrors.displayName)}>
-              <FieldLabel htmlFor={displayNameId}>Name</FieldLabel>
+              <FieldLabel htmlFor={displayNameId}>Имя</FieldLabel>
               <Input
                 id={displayNameId}
                 name={field.name}
@@ -195,7 +195,7 @@ function RegisterForm({
           name="password"
           children={(field) => (
             <Field data-invalid={hasErrors(fieldErrors.password)}>
-              <FieldLabel htmlFor={passwordId}>Password</FieldLabel>
+              <FieldLabel htmlFor={passwordId}>Пароль</FieldLabel>
               <Input
                 id={passwordId}
                 name={field.name}
@@ -224,7 +224,7 @@ function RegisterForm({
           selector={(state) => state.isSubmitting}
           children={(isSubmitting) => (
             <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Working...' : 'Create account'}
+              {isSubmitting ? 'Создание...' : 'Создать аккаунт'}
             </Button>
           )}
         />
@@ -316,7 +316,7 @@ function LoginForm({
           name="password"
           children={(field) => (
             <Field data-invalid={hasErrors(fieldErrors.password)}>
-              <FieldLabel htmlFor={passwordId}>Password</FieldLabel>
+              <FieldLabel htmlFor={passwordId}>Пароль</FieldLabel>
               <Input
                 id={passwordId}
                 name={field.name}
@@ -345,7 +345,7 @@ function LoginForm({
           selector={(state) => state.isSubmitting}
           children={(isSubmitting) => (
             <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Working...' : 'Login'}
+              {isSubmitting ? 'Вход...' : 'Войти'}
             </Button>
           )}
         />
@@ -359,7 +359,7 @@ function FormAlert({ message }: { message: string | null }) {
 
   return (
     <Alert variant="destructive">
-      <AlertTitle>Authentication failed</AlertTitle>
+      <AlertTitle>Ошибка авторизации</AlertTitle>
       <AlertDescription>{message}</AlertDescription>
     </Alert>
   )

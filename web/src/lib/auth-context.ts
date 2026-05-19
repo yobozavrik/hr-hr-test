@@ -3,6 +3,7 @@ import type { LoginRequest, RegisterRequest, UserDto } from '@hr-recruiter/contr
 
 export type AuthContextValue = {
   user: UserDto | null
+  accessToken: string | null
   isBootstrapping: boolean
   isAuthenticated: boolean
   register: (input: RegisterRequest) => Promise<void>
