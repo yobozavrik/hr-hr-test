@@ -142,4 +142,31 @@ export class HrApiClient {
   getDailyDigest() {
     return this.request('/api/hr/digest/daily')
   }
+
+  // Unified Job Boards Search
+  search(params: {
+    text: string
+    type: 'vacancy' | 'resume'
+    source: 'all' | 'hh.ru' | 'work.ua' | 'robota.ua' | 'linkedin'
+    page?: number
+    location?: string
+  }) {
+    const searchParams = new URLSearchParams()
+    searchParams.set('text', params.text)
+    searchParams.set('type', params.type)
+    searchParams.set('source', params.source)
+    if (params.page !== undefined) searchParams.set('page', String(params.page))
+    if (params.location) searchParams.set('location', params.location)
+
+    return this.request(`/api/hr/search?${searchParams.toString()}`)
+  }
+
+  // Real-Time Match AI Analysis
+  analyzeMatch(data: {
+    vacancy: { title: string; description: string }
+    resume: { name: string; position: string; skills: string[]; experience?: string; education?: string }
+  }) {
+    return this.request('/api/hr/search/match-analyze', { method: 'POST', body: data })
+  }
 }
+

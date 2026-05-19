@@ -166,6 +166,32 @@ export const dailyDigestSchema = z.object({
   })),
 })
 
+// Search schemas
+export const searchRequestSchema = z.object({
+  text: z.string().min(1),
+  type: z.enum(['vacancy', 'resume']).default('vacancy'),
+  source: z.enum(['all', 'hh.ru', 'work.ua', 'robota.ua', 'linkedin']).default('all'),
+  page: z.coerce.number().min(0).default(0),
+  location: z.string().optional(),
+})
+
+export const searchResultItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  company: z.string().optional(),
+  location: z.string().nullable(),
+  salaryFrom: z.number().nullable(),
+  salaryTo: z.number().nullable(),
+  currency: z.string().nullable(),
+  description: z.string(),
+  url: z.string(),
+  source: z.enum(['hh.ru', 'work.ua', 'robota.ua', 'linkedin']),
+  skills: z.array(z.string()).optional(),
+  candidateName: z.string().optional(),
+})
+
+export const searchResponseSchema = z.array(searchResultItemSchema)
+
 // Export types
 export type Vacancy = z.infer<typeof vacancySchema>
 export type CreateVacancyRequest = z.infer<typeof createVacancyRequestSchema>
@@ -189,3 +215,7 @@ export type EmailLog = z.infer<typeof emailLogSchema>
 export type SendEmailRequest = z.infer<typeof sendEmailRequestSchema>
 
 export type DailyDigest = z.infer<typeof dailyDigestSchema>
+
+export type SearchRequest = z.infer<typeof searchRequestSchema>
+export type SearchResultItem = z.infer<typeof searchResultItemSchema>
+
