@@ -12,11 +12,11 @@ const navLinkClass = cn(
 
 const appNavItems = [
   { to: '/app', label: 'Дашборд' },
-  { to: '/app/search', label: 'Поиск' },
-  { to: '/app/vacancies', label: 'Вакансии' },
+  { to: '/app/search', label: 'Пошук' },
+  { to: '/app/vacancies', label: 'Вакансії' },
   { to: '/app/resumes', label: 'Резюме' },
-  { to: '/app/matches', label: 'Матчи' },
-  { to: '/app/tasks', label: 'Задачи' },
+  { to: '/app/matches', label: 'Матчі' },
+  { to: '/app/tasks', label: 'Завдання' },
 ]
 
 export function RootLayout() {
@@ -46,13 +46,13 @@ export function RootLayout() {
                 ))}
                 <Separator orientation="vertical" className="h-6" />
                 <Button type="button" variant="outline" size="sm" onClick={() => void auth.logout()}>
-                  Выйти
+                  Вийти
                 </Button>
               </>
             ) : (
               <Typography asChild variant="control" tone="muted">
                 <Link to="/" className={navLinkClass}>
-                  Войти
+                  Увійти
                 </Link>
               </Typography>
             )}

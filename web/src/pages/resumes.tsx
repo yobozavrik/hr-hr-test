@@ -11,12 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea'
 
 const statusLabels: Record<string, string> = {
-  new: 'Новое',
+  new: 'Нове',
   contact: 'Контакт',
-  interview: 'Собеседование',
+  interview: 'Співбесіда',
   offer: 'Оффер',
-  hired: 'Нанят',
-  rejected: 'Отказ',
+  hired: 'Найнятий',
+  rejected: 'Відмова',
 }
 
 export function ResumesPage() {
@@ -46,7 +46,7 @@ export function ResumesPage() {
       skills: form.skills.split(',').map((s) => s.trim()).filter(Boolean),
       experience: form.experience || undefined,
       education: form.education || undefined,
-      currency: 'RUB',
+      currency: 'UAH',
       source: 'manual',
     }, {
       onSuccess: () => {
@@ -69,19 +69,19 @@ export function ResumesPage() {
       <div className="flex items-center justify-between">
         <div>
           <Typography variant="h2">Резюме</Typography>
-          <Typography tone="muted">Управление кандидатами</Typography>
+          <Typography tone="muted">Керування кандидатами</Typography>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>+ Новое резюме</Button>
+            <Button>+ Нове резюме</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>Новое резюме</DialogTitle>
+              <DialogTitle>Нове резюме</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="grid gap-4">
               <div className="grid gap-2">
-                <Label>ФИО</Label>
+                <Label>ПІБ</Label>
                 <Input value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} required />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -95,27 +95,27 @@ export function ResumesPage() {
                 </div>
               </div>
               <div className="grid gap-2">
-                <Label>Позиция</Label>
+                <Label>Посада</Label>
                 <Input value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} required />
               </div>
               <div className="grid gap-2">
-                <Label>Ожидаемая ЗП</Label>
+                <Label>Очікувана ЗП</Label>
                 <Input type="number" value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} />
               </div>
               <div className="grid gap-2">
-                <Label>Навыки (через запятую)</Label>
+                <Label>Навички (через кому)</Label>
                 <Input value={form.skills} onChange={(e) => setForm({ ...form, skills: e.target.value })} placeholder="React, TypeScript, Node.js" />
               </div>
               <div className="grid gap-2">
-                <Label>Опыт</Label>
+                <Label>Досвід</Label>
                 <Textarea value={form.experience} onChange={(e) => setForm({ ...form, experience: e.target.value })} />
               </div>
               <div className="grid gap-2">
-                <Label>Образование</Label>
+                <Label>Освіта</Label>
                 <Textarea value={form.education} onChange={(e) => setForm({ ...form, education: e.target.value })} />
               </div>
               <Button type="submit" disabled={createMutation.isPending}>
-                {createMutation.isPending ? <Spinner className="size-4" /> : 'Создать'}
+                {createMutation.isPending ? <Spinner className="size-4" /> : 'Створити'}
               </Button>
             </form>
           </DialogContent>
@@ -158,7 +158,7 @@ export function ResumesPage() {
                     onClick={() => deleteMutation.mutate(resume.id)}
                     disabled={deleteMutation.isPending}
                   >
-                    Удалить
+                    Видалити
                   </Button>
                 </div>
               </div>
@@ -167,7 +167,7 @@ export function ResumesPage() {
         ))}
         {(!data || data.length === 0) && (
           <Card className="p-8 text-center">
-            <Typography tone="muted">Нет резюме. Добавьте первое!</Typography>
+            <Typography tone="muted">Немає резюме. Додайте перше!</Typography>
           </Card>
         )}
       </div>

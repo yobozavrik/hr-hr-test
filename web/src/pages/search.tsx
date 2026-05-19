@@ -88,7 +88,7 @@ export function SearchPage() {
     if (searchType === 'vacancy') {
       saveVacancyMutation.mutate({
         title: item.title,
-        company: item.company || 'Неизвестная компания',
+        company: item.company || 'Невідома компанія',
         location: item.location,
         salaryFrom: item.salaryFrom,
         salaryTo: item.salaryTo,
@@ -99,7 +99,7 @@ export function SearchPage() {
       })
     } else {
       saveResumeMutation.mutate({
-        fullName: item.candidateName || 'Соискатель',
+        fullName: item.candidateName || 'Шукач',
         position: item.title,
         location: item.location,
         salary: item.salaryFrom,
@@ -151,7 +151,7 @@ export function SearchPage() {
         description: dbVacancy.description
       }
       resumeData = {
-        name: item.candidateName || 'Соискатель',
+        name: item.candidateName || 'Шукач',
         position: item.title,
         skills: item.skills || [],
         experience: item.description,
@@ -175,10 +175,10 @@ export function SearchPage() {
       <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
         <div>
           <Typography variant="h1" className="bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">
-            Умный Поиск
+            Розумний Пошук
           </Typography>
           <Typography tone="muted" className="text-lg">
-            Мульти-платформенный поиск вакансий и резюме с поддержкой мгновенной AI-оценки
+            Мультиплатформний пошук вакансій та резюме з підтримкою миттєвої AI-оцінки
           </Typography>
         </div>
 
@@ -195,7 +195,7 @@ export function SearchPage() {
             }}
             className="rounded-lg px-4"
           >
-            Вакансии
+            Вакансії
           </Button>
           <Button
             variant={searchType === 'resume' ? 'default' : 'ghost'}
@@ -219,13 +219,13 @@ export function SearchPage() {
           <form onSubmit={handleSearch} className="grid gap-6">
             {/* Keyword search & Submit */}
             <div className="grid gap-2">
-              <Label className="text-sm font-semibold">Ключевые слова, стек или должность</Label>
+              <Label className="text-sm font-semibold">Ключові слова, стек або посада</Label>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <Input
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
-                    placeholder={searchType === 'vacancy' ? "Например: React разработчик, Node.js, UI/UX" : "Например: Python инженер, QA Automation"}
+                    placeholder={searchType === 'vacancy' ? "Наприклад: React розробник, Node.js, UI/UX" : "Наприклад: Python інженер, QA Automation"}
                     className="pr-10 h-11 bg-background/50 border-border/60 focus:border-primary"
                   />
                   <div className="absolute right-3 top-3.5 opacity-40">
@@ -235,7 +235,7 @@ export function SearchPage() {
                   </div>
                 </div>
                 <Button type="submit" disabled={isLoading} size="lg" className="h-11 px-8 font-semibold shadow-md bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-600/90 text-white">
-                  {isLoading ? <Spinner className="size-4 mr-2" /> : 'Найти'}
+                  {isLoading ? <Spinner className="size-4 mr-2" /> : 'Знайти'}
                 </Button>
               </div>
             </div>
@@ -246,12 +246,12 @@ export function SearchPage() {
                 <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Платформа</Label>
                 <Select value={selectedSource} onValueChange={(val: any) => setSelectedSource(val)}>
                   <SelectTrigger className="bg-background/40">
-                    <SelectValue placeholder="Все платформы" />
+                    <SelectValue placeholder="Всі платформи" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Все платформы</SelectItem>
-                    <SelectItem value="work.ua">Work.ua (Украина)</SelectItem>
-                    <SelectItem value="robota.ua">Robota.ua (Украина)</SelectItem>
+                    <SelectItem value="all">Всі платформи</SelectItem>
+                    <SelectItem value="work.ua">Work.ua (Україна)</SelectItem>
+                    <SelectItem value="robota.ua">Robota.ua (Україна)</SelectItem>
                     <SelectItem value="linkedin">LinkedIn (Global)</SelectItem>
                     <SelectItem value="hh.ru">HeadHunter (hh.ru)</SelectItem>
                   </SelectContent>
@@ -259,18 +259,18 @@ export function SearchPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Локация / Регион</Label>
+                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Локація / Регіон</Label>
                 <Input
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Например: Киев, Удаленно"
+                  placeholder="Наприклад: Київ, Віддалено"
                   className="bg-background/40"
                 />
               </div>
 
               <div className="grid gap-2 justify-end items-end">
                 <Typography variant="bodySm" tone="muted" className="text-right sm:mt-0 mt-2">
-                  Используйте ключевые слова для сужения круга результатов
+                  Використовуйте ключові слова для звуження пошуку
                 </Typography>
               </div>
             </div>
@@ -281,7 +281,7 @@ export function SearchPage() {
       {/* Results Section */}
       {error && (
         <Card className="p-6 border-destructive/50 bg-destructive/10">
-          <Typography className="text-destructive font-semibold">Произошла ошибка при выполнении поиска</Typography>
+          <Typography className="text-destructive font-semibold">Виникла помилка під час пошуку</Typography>
           <Typography tone="muted" variant="bodySm" className="text-destructive/80 mt-1">{error.message}</Typography>
         </Card>
       )}
@@ -291,7 +291,7 @@ export function SearchPage() {
           {/* Header of results */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/40 pb-4">
             <Typography variant="h3" className="text-xl font-bold">
-              Результаты ({results.length})
+              Результати ({results.length})
             </Typography>
             
             {/* Pagination Controls */}
@@ -307,7 +307,7 @@ export function SearchPage() {
                   Назад
                 </Button>
                 <Typography variant="bodySm" className="font-medium px-2">
-                  Страница {page + 1}
+                  Сторінка {page + 1}
                 </Typography>
                 <Button
                   variant="outline"
@@ -356,7 +356,7 @@ export function SearchPage() {
 
                         {/* Title */}
                         <CardTitle className="text-xl font-bold mt-2 hover:text-primary transition-colors">
-                          {searchType === 'vacancy' ? item.title : item.candidateName || 'Соискатель'}
+                          {searchType === 'vacancy' ? item.title : item.candidateName || 'Шукач'}
                         </CardTitle>
 
                         {/* Subtitle / Company / Role */}
@@ -378,7 +378,7 @@ export function SearchPage() {
                             {item.salaryFrom.toLocaleString()}{item.salaryTo && item.salaryTo !== item.salaryFrom ? ` - ${item.salaryTo.toLocaleString()}` : ''} {item.currency || 'UAH'}
                           </Badge>
                         ) : (
-                          <Badge variant="secondary" className="px-3 py-1 text-xs rounded-lg">ЗП не указана</Badge>
+                          <Badge variant="secondary" className="px-3 py-1 text-xs rounded-lg">ЗП не вказана</Badge>
                         )}
                       </div>
                     </div>
@@ -405,16 +405,16 @@ export function SearchPage() {
                           {saveVacancyMutation.isPending || saveResumeMutation.isPending ? (
                             <Spinner className="size-4 mr-2" />
                           ) : isSaved ? (
-                            'Сохранено ✓'
+                            'Збережено ✓'
                           ) : (
-                            'Сохранить в базу'
+                            'Зберегти в базу'
                           )}
                         </Button>
 
                         {/* View Source Link */}
                         <Button size="sm" variant="outline" asChild className="border-border/60 hover:bg-muted/50">
                           <a href={item.url} target="_blank" rel="noopener noreferrer">
-                            Открыть оригинал
+                            Відкрити оригінал
                           </a>
                         </Button>
                       </div>
@@ -426,7 +426,7 @@ export function SearchPage() {
                         onClick={() => handleStartAnalysis(item)}
                         className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-900/30"
                       >
-                        ⚡ AI Анализ соответствия
+                        ⚡ AI Аналіз відповідності
                       </Button>
                     </div>
 
@@ -437,8 +437,8 @@ export function SearchPage() {
                           <div className="grid gap-1">
                             <Typography variant="bodySm" className="font-semibold text-indigo-700 dark:text-indigo-400">
                               {searchType === 'vacancy' 
-                                ? 'С кем из базы сравнить эту вакансию?' 
-                                : 'Для какой вакансии из базы сделать оценку?'
+                                ? 'З ким із бази порівняти цю вакансію?' 
+                                : 'Для якої вакансії з бази зробити оцінку?'
                               }
                             </Typography>
                             
@@ -446,7 +446,7 @@ export function SearchPage() {
                             <div className="flex items-center gap-2 mt-1">
                               <Select value={selectedMatchEntityId} onValueChange={setSelectedMatchEntityId}>
                                 <SelectTrigger className="w-[280px] bg-background/80 border-indigo-200 focus:ring-indigo-500">
-                                  <SelectValue placeholder={searchType === 'vacancy' ? 'Выберите резюме из базы...' : 'Выберите вакансию из базы...'} />
+                                  <SelectValue placeholder={searchType === 'vacancy' ? 'Оберіть резюме з бази...' : 'Оберіть вакансію з бази...'} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {searchType === 'vacancy' 
@@ -458,7 +458,7 @@ export function SearchPage() {
                                       ))
                                   }
                                   {((searchType === 'vacancy' && !savedResumes?.length) || (searchType === 'resume' && !savedVacancies?.length)) && (
-                                    <SelectItem value="none" disabled>База данных пуста</SelectItem>
+                                    <SelectItem value="none" disabled>База даних порожня</SelectItem>
                                   )}
                                 </SelectContent>
                               </Select>
@@ -469,7 +469,7 @@ export function SearchPage() {
                                 onClick={() => executeAIAnalysis(item)}
                                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
                               >
-                                {analyzeMatchMutation.isPending ? <Spinner className="size-4" /> : 'Запустить AI-Анализ'}
+                                {analyzeMatchMutation.isPending ? <Spinner className="size-4" /> : 'Запустити AI-Аналіз'}
                               </Button>
                             </div>
                           </div>
@@ -483,7 +483,7 @@ export function SearchPage() {
                             }}
                             className="text-muted-foreground hover:text-foreground h-8 px-2"
                           >
-                            Закрыть
+                            Закрити
                           </Button>
                         </div>
 
@@ -492,7 +492,7 @@ export function SearchPage() {
                           <div className="flex flex-col items-center justify-center py-8 gap-3 border border-dashed border-indigo-200/40 rounded-lg">
                             <Spinner className="size-8 text-indigo-500" />
                             <Typography variant="bodySm" tone="muted" className="animate-pulse">
-                              ИИ-Агент анализирует стек технологий, опыт и зарплату...
+                              AI-Агент аналізує стек технологій, досвід та зарплату...
                             </Typography>
                           </div>
                         )}
@@ -532,18 +532,18 @@ export function SearchPage() {
                               <div>
                                 <div className="flex items-center gap-2">
                                   <Typography variant="h4" className="text-lg font-bold">
-                                    Соответствие кандидата
+                                    Відповідність кандидата
                                   </Typography>
                                   <Badge className={
                                     matchAnalysisResult.verdict === 'strong_match' ? 'bg-emerald-500 text-white' :
                                     matchAnalysisResult.verdict === 'potential_match' ? 'bg-amber-500 text-white' : 'bg-rose-500 text-white'
                                   }>
-                                    {matchAnalysisResult.verdict === 'strong_match' ? 'Рекомендован' :
-                                     matchAnalysisResult.verdict === 'potential_match' ? 'Есть риски' : 'Не подходит'}
+                                    {matchAnalysisResult.verdict === 'strong_match' ? 'Рекомендований' :
+                                     matchAnalysisResult.verdict === 'potential_match' ? 'Є ризики' : 'Не підходить'}
                                   </Badge>
                                 </div>
                                 <Typography variant="bodySm" tone="muted" className="mt-0.5">
-                                  Анализ выполнен ИИ-рекрутером на лету
+                                  Аналіз виконано AI-рекрутером на льоту
                                 </Typography>
                               </div>
                             </div>
@@ -553,7 +553,7 @@ export function SearchPage() {
                             {/* Summary text */}
                             <div className="space-y-1">
                               <Typography variant="bodySm" className="font-bold text-foreground">
-                                Резюме оценки
+                                Резюме оцінки
                               </Typography>
                               <Typography variant="bodySm" tone="muted" className="leading-relaxed">
                                 {matchAnalysisResult.summary}
@@ -564,7 +564,7 @@ export function SearchPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div className="space-y-2 bg-emerald-500/5 p-3 rounded-lg border border-emerald-500/10">
                                 <Typography variant="bodySm" className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                                  ✓ Преимущества
+                                  ✓ Переваги
                                 </Typography>
                                 <ul className="list-disc pl-4 space-y-1">
                                   {matchAnalysisResult.pros.map((pro: string, idx: number) => (
@@ -579,7 +579,7 @@ export function SearchPage() {
 
                               <div className="space-y-2 bg-rose-500/5 p-3 rounded-lg border border-rose-500/10">
                                 <Typography variant="bodySm" className="font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
-                                  ⚠️ Недостатки / Риски
+                                  ⚠️ Недоліки / Ризики
                                 </Typography>
                                 <ul className="list-disc pl-4 space-y-1">
                                   {matchAnalysisResult.cons.map((con: string, idx: number) => (
@@ -597,7 +597,7 @@ export function SearchPage() {
                             {matchAnalysisResult.recommendations && matchAnalysisResult.recommendations.length > 0 && (
                               <div className="bg-indigo-500/5 p-4 rounded-lg border border-indigo-500/10 space-y-2">
                                 <Typography variant="bodySm" className="font-bold text-indigo-700 dark:text-indigo-400">
-                                  💡 Вопросы для интервью / Рекомендации
+                                  💡 Запитання для інтерв'ю / Рекомендації
                                 </Typography>
                                 <ul className="list-decimal pl-4 space-y-1.5">
                                   {matchAnalysisResult.recommendations.map((rec: string, idx: number) => (
@@ -623,7 +623,7 @@ export function SearchPage() {
           {results.length === 0 && (
             <Card className="p-12 text-center border border-dashed border-border/60 bg-muted/20">
               <Typography tone="muted" className="text-lg">
-                По вашему запросу ничего не найдено. Попробуйте изменить ключевые слова или сбросить фильтры.
+                За вашим запитом нічого не знайдено. Спробуйте змінити ключові слова або скинути фільтри.
               </Typography>
             </Card>
           )}

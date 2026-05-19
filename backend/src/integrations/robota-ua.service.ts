@@ -27,13 +27,13 @@ export class RobotaUaScraper implements JobBoardScraper {
             
             return {
               id: `robota_${doc.id}`,
-              title: doc.title || doc.name || 'Вакансия',
-              company: doc.companyName || doc.company?.name || 'Компания',
-              location: doc.cityName || doc.city?.name || 'Украина',
+              title: doc.title || doc.name || 'Вакансія',
+              company: doc.companyName || doc.company?.name || 'Компанія',
+              location: doc.cityName || doc.city?.name || 'Україна',
               salaryFrom: salaryFrom ? Number(salaryFrom) : null,
               salaryTo: salaryTo ? Number(salaryTo) : null,
               currency: doc.currency || 'UAH',
-              description: doc.description || doc.shortDescription || 'Описание доступно на сайте.',
+              description: doc.description || doc.shortDescription || 'Опис доступний на сайті.',
               url: `https://robota.ua/ru/company/${doc.companyId}/vacancy/${doc.id}`,
               source: 'robota.ua',
             }
@@ -99,22 +99,22 @@ export class RobotaUaScraper implements JobBoardScraper {
         const id = idMatch[1]
         
         // Extract title
-        let title = 'Вакансия'
+        let title = 'Вакансія'
         const titleMatch = chunk.match(/class="[^"]*card-title[^"]*"[^>]*>([\s\S]*?)<\/h[23]>/i)
         if (titleMatch) title = titleMatch[1].replace(/<[^>]*>/g, '').trim()
 
         // Extract company
-        let company = 'Работодатель'
+        let company = 'Роботодавець'
         const companyMatch = chunk.match(/class="[^"]*company-profile[^"]*"[^>]*>([\s\S]*?)<\/span>/i)
         if (companyMatch) company = companyMatch[1].replace(/<[^>]*>/g, '').trim()
 
         // Extract description
-        let description = 'Описание доступно по ссылке.'
+        let description = 'Опис доступний за посиланням.'
         const descMatch = chunk.match(/class="[^"]*card-description[^"]*"[^>]*>([\s\S]*?)<\/p>/i)
         if (descMatch) description = descMatch[1].replace(/<[^>]*>/g, '').trim()
 
         // Location
-        let location = 'Украина'
+        let location = 'Україна'
         const locMatch = chunk.match(/class="[^"]*city[^"]*"[^>]*>([\s\S]*?)<\/span>/i)
         if (locMatch) location = locMatch[1].replace(/<[^>]*>/g, '').trim()
 
@@ -149,12 +149,12 @@ export class RobotaUaScraper implements JobBoardScraper {
       const id = idMatch[1]
 
       // Extract Name
-      let candidateName = 'Соискатель'
+      let candidateName = 'Шукач'
       const nameMatch = chunk.match(/class="[^"]*candidate-name[^"]*"[^>]*>([\s\S]*?)<\/h[23]>/i)
       if (nameMatch) candidateName = nameMatch[1].replace(/<[^>]*>/g, '').trim()
 
       // Extract Title/Position
-      let title = 'Специалист'
+      let title = 'Фахівець'
       const titleMatch = chunk.match(/class="[^"]*candidate-position[^"]*"[^>]*>([\s\S]*?)<\/p>/i)
       if (titleMatch) title = titleMatch[1].replace(/<[^>]*>/g, '').trim()
 
@@ -164,7 +164,7 @@ export class RobotaUaScraper implements JobBoardScraper {
       if (descMatch) description = descMatch[1].replace(/<[^>]*>/g, '').trim()
 
       // Location
-      let location = 'Украина'
+      let location = 'Україна'
       const locMatch = chunk.match(/class="[^"]*candidate-city[^"]*"[^>]*>([\s\S]*?)<\/span>/i)
       if (locMatch) location = locMatch[1].replace(/<[^>]*>/g, '').trim()
 
@@ -173,7 +173,7 @@ export class RobotaUaScraper implements JobBoardScraper {
         title,
         candidateName,
         location,
-        description: description || 'Информация доступна в резюме по ссылке.',
+        description: description || 'Інформація доступна в резюме за посиланням.',
         url: `${this.baseUrl}/ru/candidate/${id}`,
         source: 'robota.ua',
       })
@@ -189,11 +189,11 @@ export class RobotaUaScraper implements JobBoardScraper {
         id: `robota_mock_1`,
         title: `Senior ${text} Specialist`,
         company: 'Nova Poshta Tech',
-        location: 'Киев',
+        location: 'Київ',
         salaryFrom: 80000,
         salaryTo: 110000,
         currency: 'UAH',
-        description: `Ищем опытного ${text} в нашу техническую команду для работы над высоконагруженными сервисами логистики. Требуется опыт работы от 4-х лет.`,
+        description: `Шукаємо досвідченого ${text} в нашу технічну команду для роботи над високонавантаженими сервісами логістики. Потрібен досвід роботи від 4-х років.`,
         url: 'https://robota.ua/ru/company/nova-poshta/vacancy/mock1',
         source: 'robota.ua'
       },
@@ -201,11 +201,11 @@ export class RobotaUaScraper implements JobBoardScraper {
         id: `robota_mock_2`,
         title: `Middle ${text} Developer`,
         company: 'SoftServe',
-        location: 'Львов (Удаленно)',
+        location: 'Львів (Віддалено)',
         salaryFrom: 2000,
         salaryTo: 3500,
         currency: 'USD',
-        description: `Мы расширяем проект крупного ритейл-клиента из США. Ищем разработчика с хорошим разговорным английским и стеком вокруг ${text}.`,
+        description: `Ми розширюємо проєкт великого ритейл-клієнта з США. Шукаємо розробника з розмовною англійською та стеком навколо ${text}.`,
         url: 'https://robota.ua/ru/company/softserve/vacancy/mock2',
         source: 'robota.ua'
       }
@@ -217,22 +217,22 @@ export class RobotaUaScraper implements JobBoardScraper {
       {
         id: `robota_resume_mock_1`,
         title: `${text} Lead`,
-        candidateName: 'Алексей Шевченко',
-        location: 'Киев',
+        candidateName: 'Олексій Шевченко',
+        location: 'Київ',
         salaryFrom: 4000,
         currency: 'USD',
-        description: `Опыт работы более 6 лет. Успешный опыт проектирования систем по методологии ${text}. Знание паттернов программирования, архитектурных стилей и современных практик.`,
+        description: `Досвід роботи більше 6 років. Успішний досвід проектування систем за методологією ${text}. Знання патернів програмування, архітектурних стилей та сучасних практик.`,
         url: 'https://robota.ua/ru/candidate/mock1',
         source: 'robota.ua'
       },
       {
         id: `robota_resume_mock_2`,
         title: `Junior ${text} Engineer`,
-        candidateName: 'Ирина Кравченко',
-        location: 'Одесса',
+        candidateName: 'Ірина Кравченко',
+        location: 'Одеса',
         salaryFrom: 800,
         currency: 'USD',
-        description: `Закончила профильные курсы по направлению ${text}. Владею HTML/CSS/JS, базовыми принципами работы с фреймворками. Готова учиться и развиваться.`,
+        description: `Закінчила профільні курси за напрямком ${text}. Володію HTML/CSS/JS, базовими принципами роботи з фреймворками. Готова вчитися та розвиватися.`,
         url: 'https://robota.ua/ru/candidate/mock2',
         source: 'robota.ua'
       }

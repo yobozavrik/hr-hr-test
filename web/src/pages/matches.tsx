@@ -34,20 +34,20 @@ export function MatchesPage() {
   return (
     <div className="grid gap-6">
       <div>
-        <Typography variant="h2">Матчи</Typography>
-        <Typography tone="muted">Сопоставление вакансий и резюме</Typography>
+        <Typography variant="h2">Матчі</Typography>
+        <Typography tone="muted">Зіставлення вакансій та резюме</Typography>
       </div>
 
       {/* Create Match */}
       <Card>
         <CardHeader>
-          <CardTitle>Создать матч</CardTitle>
+          <CardTitle>Створити матч</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <Select value={selectedVacancy} onValueChange={setSelectedVacancy}>
               <SelectTrigger>
-                <SelectValue placeholder="Выберите вакансию" />
+                <SelectValue placeholder="Оберіть вакансію" />
               </SelectTrigger>
               <SelectContent>
                 {vacancies?.map((v: any) => (
@@ -57,7 +57,7 @@ export function MatchesPage() {
             </Select>
             <Select value={selectedResume} onValueChange={setSelectedResume}>
               <SelectTrigger>
-                <SelectValue placeholder="Выберите резюме" />
+                <SelectValue placeholder="Оберіть резюме" />
               </SelectTrigger>
               <SelectContent>
                 {resumes?.map((r: any) => (
@@ -67,7 +67,7 @@ export function MatchesPage() {
             </Select>
           </div>
           <Button onClick={handleCreate} disabled={!selectedVacancy || !selectedResume || createMutation.isPending}>
-            {createMutation.isPending ? <Spinner className="size-4" /> : 'Создать матч'}
+            {createMutation.isPending ? <Spinner className="size-4" /> : 'Створити матч'}
           </Button>
         </CardContent>
       </Card>
@@ -94,7 +94,7 @@ export function MatchesPage() {
                       {match.score}%
                     </Badge>
                     <Typography variant="bodySm" tone="muted" className="mt-1">
-                      {match.status === 'pending' ? 'На рассмотрении' : match.status === 'approved' ? 'Одобрен' : 'Отклонен'}
+                      {match.status === 'pending' ? 'На розгляді' : match.status === 'approved' ? 'Схвалено' : 'Відхилено'}
                     </Typography>
                   </div>
                   {match.status === 'pending' && (
@@ -103,14 +103,14 @@ export function MatchesPage() {
                         size="sm"
                         onClick={() => updateMutation.mutate({ id: match.id, status: 'approved' })}
                       >
-                        Одобрить
+                        Схвалити
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => updateMutation.mutate({ id: match.id, status: 'rejected' })}
                       >
-                        Отклонить
+                        Відхилити
                       </Button>
                     </div>
                   )}
@@ -121,7 +121,7 @@ export function MatchesPage() {
         ))}
         {(!matches || matches.length === 0) && (
           <Card className="p-8 text-center">
-            <Typography tone="muted">Нет матчей. Создайте первый!</Typography>
+            <Typography tone="muted">Немає матчів. Створіть перший!</Typography>
           </Card>
         )}
       </div>

@@ -17,7 +17,7 @@ export function HomePage() {
           <CardContent className="flex items-center gap-3">
             <Spinner />
             <Typography variant="bodySm" tone="muted">
-              Проверка сессии...
+              Перевірка сесії...
             </Typography>
           </CardContent>
         </Card>
@@ -29,20 +29,20 @@ export function HomePage() {
     return (
       <section className="mx-auto grid w-full max-w-6xl gap-6 px-5 py-16">
         <Badge variant="outline" className="w-fit">
-          Авторизован
+          Авторизований
         </Badge>
         <div className="grid max-w-3xl gap-4">
-          <Typography variant="h1">Сессия активна</Typography>
+          <Typography variant="h1">Сесія активна</Typography>
           <Typography className="max-w-2xl" tone="muted">
-            Вы вошли как{' '}
+            Ви увійшли як{' '}
             <Typography as="strong" variant="emphasis" tone="default">
               {auth.user.email}
             </Typography>
-            . Добро пожаловать в HR Recruiter.
+            . Ласкаво просимо до HR Recruiter.
           </Typography>
         </div>
         <Button asChild size="lg" className="w-fit">
-          <Link to="/app">Открыть дашборд</Link>
+          <Link to="/app">Відкрити дашборд</Link>
         </Button>
       </section>
     )
@@ -55,15 +55,15 @@ export function HomePage() {
           HR Recruiter
         </Badge>
         <Typography className="max-w-3xl" variant="h1">
-          Умный рекрутинг с ИИ-ассистентом
+          Розумний рекрутинг з AI-асистентом
         </Typography>
         <Typography className="max-w-2xl" tone="muted">
-          Автоматизация подбора персонала: поиск вакансий и резюме, AI-матчинг, 
-          интеграция с Google Calendar, Sheets и Gmail, ежедневные сводки.
+          Автоматизація підбору персоналу: пошук вакансій та резюме, AI-матчинг, 
+          інтеграція з Google Calendar, Sheets та Gmail, щоденні зведення.
         </Typography>
         <div className="flex gap-3">
           <Button asChild size="lg">
-            <Link to="/app">Начать работу</Link>
+            <Link to="/app">Почати роботу</Link>
           </Button>
         </div>
       </div>

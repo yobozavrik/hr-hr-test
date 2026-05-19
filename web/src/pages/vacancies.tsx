@@ -33,7 +33,7 @@ export function VacanciesPage() {
       salaryFrom: form.salaryFrom ? Number(form.salaryFrom) : undefined,
       salaryTo: form.salaryTo ? Number(form.salaryTo) : undefined,
       description: form.description,
-      currency: 'RUB',
+      currency: 'UAH',
       source: 'manual',
     }, {
       onSuccess: () => {
@@ -55,33 +55,33 @@ export function VacanciesPage() {
     <div className="grid gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <Typography variant="h2">Вакансии</Typography>
-          <Typography tone="muted">Управление вакансиями</Typography>
+          <Typography variant="h2">Вакансії</Typography>
+          <Typography tone="muted">Керування вакансіями</Typography>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>+ Новая вакансия</Button>
+            <Button>+ Нова вакансія</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>Новая вакансия</DialogTitle>
+              <DialogTitle>Нова вакансія</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="grid gap-4">
               <div className="grid gap-2">
-                <Label>Название позиции</Label>
+                <Label>Назва позиції</Label>
                 <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
               </div>
               <div className="grid gap-2">
-                <Label>Компания</Label>
+                <Label>Компанія</Label>
                 <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} required />
               </div>
               <div className="grid gap-2">
-                <Label>Локация</Label>
+                <Label>Локація</Label>
                 <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label>ЗП от</Label>
+                  <Label>ЗП від</Label>
                   <Input type="number" value={form.salaryFrom} onChange={(e) => setForm({ ...form, salaryFrom: e.target.value })} />
                 </div>
                 <div className="grid gap-2">
@@ -90,11 +90,11 @@ export function VacanciesPage() {
                 </div>
               </div>
               <div className="grid gap-2">
-                <Label>Описание</Label>
+                <Label>Опис</Label>
                 <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
               </div>
               <Button type="submit" disabled={createMutation.isPending}>
-                {createMutation.isPending ? <Spinner className="size-4" /> : 'Создать'}
+                {createMutation.isPending ? <Spinner className="size-4" /> : 'Створити'}
               </Button>
             </form>
           </DialogContent>
@@ -113,7 +113,7 @@ export function VacanciesPage() {
                   </Typography>
                 </div>
                 <Badge variant={vacancy.status === 'active' ? 'default' : 'secondary'}>
-                  {vacancy.status === 'active' ? 'Активна' : 'Закрыта'}
+                  {vacancy.status === 'active' ? 'Активна' : 'Закрита'}
                 </Badge>
               </div>
             </CardHeader>
@@ -126,7 +126,7 @@ export function VacanciesPage() {
                 )}
                 <div className="ml-auto flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => alert(`Vacancy ID: ${vacancy.id}`)}>
-                    Подробнее
+                    Детальніше
                   </Button>
                   <Button
                     variant="destructive"
@@ -134,7 +134,7 @@ export function VacanciesPage() {
                     onClick={() => deleteMutation.mutate(vacancy.id)}
                     disabled={deleteMutation.isPending}
                   >
-                    Удалить
+                    Видалити
                   </Button>
                 </div>
               </div>
@@ -143,7 +143,7 @@ export function VacanciesPage() {
         ))}
         {(!data || data.length === 0) && (
           <Card className="p-8 text-center">
-            <Typography tone="muted">Нет вакансий. Создайте первую!</Typography>
+            <Typography tone="muted">Немає вакансій. Створіть першу!</Typography>
           </Card>
         )}
       </div>

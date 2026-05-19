@@ -26,17 +26,17 @@ export function DashboardPage() {
   }
 
   const stats = [
-    { label: 'Вакансий', value: vacancies.data?.length ?? 0, path: '/app/vacancies', color: 'bg-blue-500' },
+    { label: 'Вакансій', value: vacancies.data?.length ?? 0, path: '/app/vacancies', color: 'bg-blue-500' },
     { label: 'Резюме', value: resumes.data?.length ?? 0, path: '/app/resumes', color: 'bg-green-500' },
-    { label: 'Матчей', value: matches.data?.length ?? 0, path: '/app/matches', color: 'bg-purple-500' },
-    { label: 'Задач сегодня', value: tasks.data?.length ?? 0, path: '/app/tasks', color: 'bg-orange-500' },
+    { label: 'Матчів', value: matches.data?.length ?? 0, path: '/app/matches', color: 'bg-purple-500' },
+    { label: 'Завдань сьогодні', value: tasks.data?.length ?? 0, path: '/app/tasks', color: 'bg-orange-500' },
   ]
 
   return (
     <div className="grid gap-6">
       <div>
-        <Typography variant="h2">Привет, {auth.user?.displayName || auth.user?.email}!</Typography>
-        <Typography tone="muted">Ваша HR-панель управления</Typography>
+        <Typography variant="h2">Привіт, {auth.user?.displayName || auth.user?.email}!</Typography>
+        <Typography tone="muted">Ваша HR-панель керування</Typography>
       </div>
 
       {/* Stats */}
@@ -52,7 +52,7 @@ export function DashboardPage() {
             </CardHeader>
             <CardContent>
               <Button asChild variant="ghost" size="sm">
-                <Link to={stat.path}>Подробнее</Link>
+                <Link to={stat.path}>Детальніше</Link>
               </Button>
             </CardContent>
           </Card>
@@ -65,25 +65,25 @@ export function DashboardPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Ежедневная сводка</CardTitle>
-                <CardDescription>Новое за последние 24 часа</CardDescription>
+                <CardTitle>Щоденне зведення</CardTitle>
+                <CardDescription>Нове за останні 24 години</CardDescription>
               </div>
-              <Badge variant="secondary">{new Date(digest.data.date).toLocaleDateString('ru-RU')}</Badge>
+              <Badge variant="secondary">{new Date(digest.data.date).toLocaleDateString('uk-UA')}</Badge>
             </div>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="flex flex-col items-center gap-1 rounded-lg bg-muted p-4">
                 <span className="text-2xl font-bold">{digest.data.newVacancies}</span>
-                <span className="text-sm text-muted-foreground">Новых вакансий</span>
+                <span className="text-sm text-muted-foreground">Нових вакансій</span>
               </div>
               <div className="flex flex-col items-center gap-1 rounded-lg bg-muted p-4">
                 <span className="text-2xl font-bold">{digest.data.newResumes}</span>
-                <span className="text-sm text-muted-foreground">Новых резюме</span>
+                <span className="text-sm text-muted-foreground">Нових резюме</span>
               </div>
               <div className="flex flex-col items-center gap-1 rounded-lg bg-muted p-4">
                 <span className="text-2xl font-bold">{digest.data.newMatches}</span>
-                <span className="text-sm text-muted-foreground">Новых матчей</span>
+                <span className="text-sm text-muted-foreground">Нових матчів</span>
               </div>
             </div>
           </CardContent>
@@ -95,11 +95,11 @@ export function DashboardPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Предстоящие задачи</CardTitle>
-              <CardDescription>На ближайшие 24 часа</CardDescription>
+              <CardTitle>Найближчі завдання</CardTitle>
+              <CardDescription>На найближчі 24 години</CardDescription>
             </div>
             <Button asChild size="sm">
-              <Link to="/app/tasks">Все задачи</Link>
+              <Link to="/app/tasks">Усі завдання</Link>
             </Button>
           </div>
         </CardHeader>
@@ -111,17 +111,17 @@ export function DashboardPage() {
                   <div>
                     <Typography variant="bodySm" className="font-medium">{task.title}</Typography>
                     <Typography variant="bodySm" tone="muted">
-                      {new Date(task.scheduledAt).toLocaleString('ru-RU')}
+                      {new Date(task.scheduledAt).toLocaleString('uk-UA')}
                     </Typography>
                   </div>
                   <Badge variant={task.eventType === 'interview' ? 'default' : 'secondary'}>
-                    {task.eventType === 'interview' ? 'Собеседование' : task.eventType === 'call' ? 'Звонок' : 'Встреча'}
+                    {task.eventType === 'interview' ? 'Співбесіда' : task.eventType === 'call' ? 'Дзвінок' : 'Зустріч'}
                   </Badge>
                 </div>
               ))}
             </div>
           ) : (
-            <Typography tone="muted" className="text-center py-4">Нет предстоящих задач</Typography>
+            <Typography tone="muted" className="text-center py-4">Немає найближчих завдань</Typography>
           )}
         </CardContent>
       </Card>

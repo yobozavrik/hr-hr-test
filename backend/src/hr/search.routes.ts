@@ -69,12 +69,12 @@ export function createSearchRoutes(db: any) {
               return res.items.map((item) => ({
                 id: `hh_${item.id}`,
                 title: item.name,
-                company: item.employer?.name || 'Работодатель',
-                location: item.area?.name || 'РФ',
+                company: item.employer?.name || 'Роботодавець',
+                location: item.area?.name || 'Україна',
                 salaryFrom: item.salary?.from || null,
                 salaryTo: item.salary?.to || null,
-                currency: item.salary?.currency || 'RUB',
-                description: item.snippet?.requirement || item.snippet?.responsibility || 'Описание доступно на сайте.',
+                currency: item.salary?.currency || 'UAH',
+                description: item.snippet?.requirement || item.snippet?.responsibility || 'Опис доступний на сайті.',
                 url: item.alternate_url || `https://hh.ru/vacancy/${item.id}`,
                 source: 'hh.ru' as const,
               }))
@@ -85,9 +85,9 @@ export function createSearchRoutes(db: any) {
               return res.items.map((item) => ({
                 id: `hh_resume_${item.id}`,
                 title: text,
-                candidateName: 'Соискатель hh.ru',
-                location: 'РФ',
-                description: 'Резюме найдено на hh.ru. Нажмите для подробного просмотра.',
+                candidateName: 'Шукач hh.ru',
+                location: 'Україна',
+                description: 'Резюме знайдено на hh.ru. Натисніть для детального перегляду.',
                 url: item.url || `https://hh.ru/resume/${item.id}`,
                 source: 'hh.ru' as const,
               }))

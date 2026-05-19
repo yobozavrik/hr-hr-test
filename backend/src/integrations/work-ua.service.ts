@@ -120,7 +120,7 @@ export class WorkUaScraper implements JobBoardScraper {
       }
 
       // Location
-      let location = 'Украина'
+      let location = 'Україна'
       const locMatch = chunk.match(/(?:<span>·\s*|·\s*)([А-Яа-яA-Za-z\s-]+)(?:\s*·|\s*<\/span>)/)
       if (locMatch) {
         location = locMatch[1].trim()
@@ -134,7 +134,7 @@ export class WorkUaScraper implements JobBoardScraper {
         salaryFrom,
         salaryTo,
         currency,
-        description: description || 'Описание вакансии доступно по ссылке.',
+        description: description || 'Опис вакансії доступний за посиланням.',
         url,
         source: 'work.ua',
       })
@@ -167,7 +167,7 @@ export class WorkUaScraper implements JobBoardScraper {
       }
 
       // Extract Position/Title
-      let title = 'Соискатель'
+      let title = 'Шукач'
       const titleMatch = chunk.match(/<h2[^>]*>([\s\S]*?)<\/h2>/)
       if (titleMatch) {
         const cleanH2 = titleMatch[1].replace(/<[^>]*>/g, '').trim()
@@ -197,7 +197,7 @@ export class WorkUaScraper implements JobBoardScraper {
       }
 
       // Location
-      let location = 'Украина'
+      let location = 'Україна'
       const locMatch = chunk.match(/(?:·\s*)([А-Яа-яA-Za-z\s-]+)(?:\s*·|\s*<\/p>|\s*·\s*<b>)/)
       if (locMatch) {
         location = locMatch[1].trim()
@@ -211,7 +211,7 @@ export class WorkUaScraper implements JobBoardScraper {
         salaryFrom,
         salaryTo: salaryFrom,
         currency,
-        description: description || 'Информация доступна в резюме по ссылке.',
+        description: description || 'Інформація доступна в резюме за посиланням.',
         url,
         source: 'work.ua',
       })

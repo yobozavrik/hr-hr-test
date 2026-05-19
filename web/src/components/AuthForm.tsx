@@ -55,9 +55,9 @@ export function AuthForm() {
   return (
     <Card className="w-full" aria-label="Authentication">
       <CardHeader>
-        <CardTitle>Доступ к аккаунту</CardTitle>
+        <CardTitle>Доступ до акаунту</CardTitle>
         <CardDescription>
-          Создайте аккаунт или войдите в существующий.
+          Створіть акаунт або увійдіть в існуючий.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -71,8 +71,8 @@ export function AuthForm() {
           className="mb-6"
         >
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="register">Регистрация</TabsTrigger>
-            <TabsTrigger value="login">Вход</TabsTrigger>
+            <TabsTrigger value="register">Реєстрація</TabsTrigger>
+            <TabsTrigger value="login">Вхід</TabsTrigger>
           </TabsList>
 
           <TabsContent value="register" forceMount hidden={mode !== 'register'} className="mt-6">
@@ -124,7 +124,7 @@ function RegisterForm({
           setFormError(caughtError.message)
           return
         }
-        setFormError('Unexpected auth error')
+        setFormError('Неочікувана помилка авторизації')
       }
     },
   })
@@ -141,7 +141,7 @@ function RegisterForm({
           name="displayName"
           children={(field) => (
             <Field data-invalid={hasErrors(fieldErrors.displayName)}>
-              <FieldLabel htmlFor={displayNameId}>Имя</FieldLabel>
+              <FieldLabel htmlFor={displayNameId}>Ім'я</FieldLabel>
               <Input
                 id={displayNameId}
                 name={field.name}
@@ -224,7 +224,7 @@ function RegisterForm({
           selector={(state) => state.isSubmitting}
           children={(isSubmitting) => (
             <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Создание...' : 'Создать аккаунт'}
+              {isSubmitting ? 'Створення...' : 'Створити акаунт'}
             </Button>
           )}
         />
@@ -271,7 +271,7 @@ function LoginForm({
           setFormError(caughtError.message)
           return
         }
-        setFormError('Unexpected auth error')
+        setFormError('Неочікувана помилка авторизації')
       }
     },
   })
@@ -345,7 +345,7 @@ function LoginForm({
           selector={(state) => state.isSubmitting}
           children={(isSubmitting) => (
             <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Вход...' : 'Войти'}
+              {isSubmitting ? 'Вхід...' : 'Увійти'}
             </Button>
           )}
         />
@@ -359,7 +359,7 @@ function FormAlert({ message }: { message: string | null }) {
 
   return (
     <Alert variant="destructive">
-      <AlertTitle>Ошибка авторизации</AlertTitle>
+      <AlertTitle>Помилка авторизації</AlertTitle>
       <AlertDescription>{message}</AlertDescription>
     </Alert>
   )

@@ -47,29 +47,29 @@ export function TasksPage() {
   }
 
   const typeLabels: Record<string, string> = {
-    interview: 'Собеседование',
-    call: 'Звонок',
-    meeting: 'Встреча',
+    interview: 'Співбесіда',
+    call: 'Дзвінок',
+    meeting: 'Зустріч',
   }
 
   return (
     <div className="grid gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <Typography variant="h2">Задачи</Typography>
-          <Typography tone="muted">Управление задачами и встречами</Typography>
+          <Typography variant="h2">Завдання</Typography>
+          <Typography tone="muted">Керування завданнями та зустрічами</Typography>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>+ Новая задача</Button>
+            <Button>+ Нове завдання</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>Новая задача</DialogTitle>
+              <DialogTitle>Нове завдання</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="grid gap-4">
               <div className="grid gap-2">
-                <Label>Название</Label>
+                <Label>Назва</Label>
                 <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
               </div>
               <div className="grid gap-2">
@@ -79,14 +79,14 @@ export function TasksPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="interview">Собеседование</SelectItem>
-                    <SelectItem value="call">Звонок</SelectItem>
-                    <SelectItem value="meeting">Встреча</SelectItem>
+                    <SelectItem value="interview">Співбесіда</SelectItem>
+                    <SelectItem value="call">Дзвінок</SelectItem>
+                    <SelectItem value="meeting">Зустріч</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid gap-2">
-                <Label>Дата и время</Label>
+                <Label>Дата та час</Label>
                 <Input
                   type="datetime-local"
                   value={form.scheduledAt}
@@ -95,11 +95,11 @@ export function TasksPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label>Описание</Label>
+                <Label>Опис</Label>
                 <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               </div>
               <Button type="submit" disabled={createMutation.isPending}>
-                {createMutation.isPending ? <Spinner className="size-4" /> : 'Создать'}
+                {createMutation.isPending ? <Spinner className="size-4" /> : 'Створити'}
               </Button>
             </form>
           </DialogContent>
@@ -119,7 +119,7 @@ export function TasksPage() {
                     </Badge>
                   </div>
                   <Typography variant="bodySm" tone="muted" className="mt-1">
-                    {new Date(task.scheduledAt).toLocaleString('ru-RU')}
+                    {new Date(task.scheduledAt).toLocaleString('uk-UA')}
                   </Typography>
                   {task.description && (
                     <Typography variant="bodySm" className="mt-2">{task.description}</Typography>
@@ -131,7 +131,7 @@ export function TasksPage() {
                   onClick={() => deleteMutation.mutate(task.id)}
                   disabled={deleteMutation.isPending}
                 >
-                  Удалить
+                  Видалити
                 </Button>
               </div>
             </CardContent>
@@ -139,7 +139,7 @@ export function TasksPage() {
         ))}
         {(!data || data.length === 0) && (
           <Card className="p-8 text-center">
-            <Typography tone="muted">Нет задач. Создайте первую!</Typography>
+            <Typography tone="muted">Немає завдань. Створіть перше!</Typography>
           </Card>
         )}
       </div>
