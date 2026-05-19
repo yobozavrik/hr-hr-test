@@ -3,6 +3,7 @@ import { createRootRoute, createRoute, createRouter } from '@tanstack/react-rout
 import { RootLayout } from './pages/layout'
 import { HomePage } from './pages/home'
 import { DashboardPage, VacanciesPage, ResumesPage, MatchesPage, TasksPage } from './pages'
+import { SearchPage } from './pages/search'
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -44,6 +45,12 @@ const tasksRoute = createRoute({
   component: TasksPage,
 })
 
+const searchRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/app/search',
+  component: SearchPage,
+})
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   dashboardRoute,
@@ -51,6 +58,7 @@ const routeTree = rootRoute.addChildren([
   resumesRoute,
   matchesRoute,
   tasksRoute,
+  searchRoute,
 ])
 
 export const router = createRouter({ routeTree })

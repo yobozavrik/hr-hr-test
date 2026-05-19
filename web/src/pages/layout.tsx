@@ -12,6 +12,7 @@ const navLinkClass = cn(
 
 const appNavItems = [
   { to: '/app', label: 'Дашборд' },
+  { to: '/app/search', label: 'Поиск' },
   { to: '/app/vacancies', label: 'Вакансии' },
   { to: '/app/resumes', label: 'Резюме' },
   { to: '/app/matches', label: 'Матчи' },
