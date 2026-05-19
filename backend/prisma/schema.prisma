@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String        @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  displayName  String?       @map("display_name")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  sessions     AuthSession[]
+  
+  // HR specific
+  googleTokens  GoogleToken?
+  resumes       Resume[]
+  vacancies     Vacancy[]
+  tasks         Task[]
+  emailLogs     EmailLog[]
+  salaryReports SalaryReport[]
+
+  @@map("users")
+}
+
+model AuthSession {
+  id               String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId           String    @db.Uuid @map("user_id")
+  refreshTokenHash String    @unique(map: "auth_sessions_refresh_token_hash_key") @map("refresh_token_hash")
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+  userAgent        String?   @map("user_agent")
+  ipAddress        String?   @map("ip_address")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "auth_sessions_user_id_fkey")
+
+  @@index([userId], map: "auth_sessions_user_id_idx")
+  @@index([expiresAt], map: "auth_sessions_expires_at_idx")
+  @@map("auth_sessions")
+}
+
+// Google OAuth tokens for Calendar, Sheets, Gmail
+model GoogleToken {
+  id           String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId       String   @unique @db.Uuid @map("user_id")
+  accessToken  String   @map("access_token")
+  refreshToken String   @map("refresh_token")
+  expiresAt    DateTime @map("expires_at")
+  scope        String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("google_tokens")
+}
+
+// Vacancies from job boards
+model Vacancy {
+  id          String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId      String    @db.Uuid @map("user_id")
+  title       String
+  company     String
+  location    String?
+  salaryFrom  Int?      @map("salary_from")
+  salaryTo    Int?      @map("salary_to")
+  currency    String    @default("RUB")
+  description String    @db.Text
+  source      String    // e.g. "hh.ru", "linkedin"
+  sourceUrl   String    @map("source_url")
+  status      String    @default("active") // active, closed, archived
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  matches     Match[]
+
+  @@index([userId], map: "vacancies_user_id_idx")
+  @@index([status], map: "vacancies_status_idx")
+  @@map("vacancies")
+}
+
+// Resumes/Candidates
+model Resume {
+  id          String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId      String    @db.Uuid @map("user_id")
+  fullName    String    @map("full_name")
+  email       String?
+  phone       String?
+  position    String
+  salary      Int?
+  currency    String    @default("RUB")
+  skills      String[]  @default([])
+  experience  String?   @db.Text
+  education   String?   @db.Text
+  source      String    // e.g. "hh.ru", "linkedin"
+  sourceUrl   String    @map("source_url")
+  status      String    @default("new") // new, contact, interview, offer, hired, rejected
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  matches     Match[]
+
+  @@index([userId], map: "resumes_user_id_idx")
+  @@index([status], map: "resumes_status_idx")
+  @@map("resumes")
+}
+
+// Matches between vacancies and resumes
+model Match {
+  id        String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  vacancyId String   @db.Uuid @map("vacancy_id")
+  resumeId  String   @db.Uuid @map("resume_id")
+  score     Float    @default(0)
+  status    String   @default("pending") // pending, approved, rejected
+  createdAt DateTime @default(now()) @map("created_at")
+  vacancy   Vacancy  @relation(fields: [vacancyId], references: [id], onDelete: Cascade)
+  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@unique([vacancyId, resumeId], map: "matches_vacancy_resume_unique")
+  @@index([vacancyId], map: "matches_vacancy_id_idx")
+  @@index([resumeId], map: "matches_resume_id_idx")
+  @@map("matches")
+}
+
+// Tasks/Events in Google Calendar
+model Task {
+  id          String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId      String    @db.Uuid @map("user_id")
+  title       String
+  description String?   @db.Text
+  eventType   String    @map("event_type") // interview, call, meeting
+  scheduledAt DateTime  @map("scheduled_at")
+  googleEventId String? @map("google_event_id")
+  status      String    @default("pending") // pending, completed, cancelled
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "tasks_user_id_idx")
+  @@index([scheduledAt], map: "tasks_scheduled_at_idx")
+  @@map("tasks")
+}
+
+// Email logs
+model EmailLog {
+  id        String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId    String   @db.Uuid @map("user_id")
+  to        String
+  subject   String
+  body      String   @db.Text
+  status    String   @default("sent") // sent, failed, read
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "email_logs_user_id_idx")
+  @@map("email_logs")
+}
+
+// Salary comparison reports
+model SalaryReport {
+  id       String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId   String   @db.Uuid @map("user_id")
+  position String
+  location String?
+  avgSalary Int     @map("avg_salary")
+  minSalary Int     @map("min_salary")
+  maxSalary Int     @map("max_salary")
+  currency String   @default("RUB")
+  source   String   // data source
+  createdAt DateTime @default(now()) @map("created_at")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "salary_reports_user_id_idx")
+  @@map("salary_reports")
+}
