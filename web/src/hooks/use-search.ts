@@ -1,60 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/lib/use-auth'
-import { HHApiClient } from '@/lib/hh-api'
 import { HrApiClient } from '@/lib/hr-api'
-
-function useHHClient() {
-  const auth = useAuth()
-  return new HHApiClient(() => auth.accessToken)
-}
 
 function useHrClient() {
   const auth = useAuth()
   return new HrApiClient(() => auth.accessToken)
-}
-
-// HH Vacancies search
-export function useHHVacanciesSearch(params: {
-  text: string
-  area?: string
-  salary?: number
-  experience?: string
-  employment?: string
-  page?: number
-}) {
-  const client = useHHClient()
-  return useQuery({
-    queryKey: ['hh', 'vacancies', params],
-    queryFn: () => client.searchVacancies(params),
-    enabled: !!params.text && !!useAuth().accessToken,
-  })
-}
-
-export function useHHVacancy(id: string) {
-  const client = useHHClient()
-  return useQuery({
-    queryKey: ['hh', 'vacancy', id],
-    queryFn: () => client.getVacancy(id),
-    enabled: !!id && !!useAuth().accessToken,
-  })
-}
-
-export function useHHAreas() {
-  const client = useHHClient()
-  return useQuery({
-    queryKey: ['hh', 'areas'],
-    queryFn: () => client.getAreas(),
-    enabled: !!useAuth().accessToken,
-  })
-}
-
-export function useHHDictionaries() {
-  const client = useHHClient()
-  return useQuery({
-    queryKey: ['hh', 'dictionaries'],
-    queryFn: () => client.getDictionaries(),
-    enabled: !!useAuth().accessToken,
-  })
 }
 
 // Save vacancy to our database
@@ -122,7 +72,7 @@ export function useSaveResume() {
 export function useJobBoardSearch(params: {
   text: string
   type: 'vacancy' | 'resume'
-  source: 'all' | 'hh.ru' | 'work.ua' | 'robota.ua' | 'linkedin'
+  source: 'all' | 'work.ua' | 'robota.ua' | 'linkedin'
   page?: number
   location?: string
 }) {

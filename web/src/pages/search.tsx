@@ -4,7 +4,7 @@ import {
   useSaveVacancy,
   useSaveResume,
   useAnalyzeMatch
-} from '@/hooks/use-hh'
+} from '@/hooks/use-search'
 import { useVacancies, useResumes } from '@/hooks/use-hr'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -37,20 +37,15 @@ const SourceLogo = ({ source, className = "size-5" }: { source: string; classNam
           <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
         </svg>
       )
-    case 'hh.ru':
     default:
-      return (
-        <span className={`inline-flex items-center justify-center font-bold bg-[#e41b13] text-white rounded-full text-[10px] size-5 ${className}`}>
-          hh
-        </span>
-      )
+      return null
   }
 }
 
 export function SearchPage() {
   const [searchText, setSearchText] = useState('')
   const [searchType, setSearchType] = useState<'vacancy' | 'resume'>('vacancy')
-  const [selectedSource, setSelectedSource] = useState<'all' | 'hh.ru' | 'work.ua' | 'robota.ua' | 'linkedin'>('all')
+  const [selectedSource, setSelectedSource] = useState<'all' | 'work.ua' | 'robota.ua' | 'linkedin'>('all')
   const [location, setLocation] = useState('')
   const [page, setPage] = useState(0)
 
@@ -253,7 +248,6 @@ export function SearchPage() {
                     <SelectItem value="work.ua">Work.ua (Україна)</SelectItem>
                     <SelectItem value="robota.ua">Robota.ua (Україна)</SelectItem>
                     <SelectItem value="linkedin">LinkedIn (Global)</SelectItem>
-                    <SelectItem value="hh.ru">HeadHunter (hh.ru)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

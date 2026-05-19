@@ -8,7 +8,7 @@ export interface ScrapedItem {
   currency?: string | null
   description: string
   url: string
-  source: 'work.ua' | 'robota.ua' | 'linkedin' | 'hh.ru'
+  source: 'work.ua' | 'robota.ua' | 'linkedin'
   skills?: string[]
   candidateName?: string
 }

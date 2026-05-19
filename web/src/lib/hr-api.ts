@@ -147,7 +147,7 @@ export class HrApiClient {
   search(params: {
     text: string
     type: 'vacancy' | 'resume'
-    source: 'all' | 'hh.ru' | 'work.ua' | 'robota.ua' | 'linkedin'
+    source: 'all' | 'work.ua' | 'robota.ua' | 'linkedin'
     page?: number
     location?: string
   }) {

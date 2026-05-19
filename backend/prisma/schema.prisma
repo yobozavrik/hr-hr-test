@@ -54,7 +54,7 @@ model Vacancy {
   salaryTo    Int?      @map("salary_to")
   currency    String    @default("RUB")
   description String    @db.Text
-  source      String    // e.g. "hh.ru", "linkedin"
+  source      String    // e.g. "work.ua", "linkedin"
   sourceUrl   String?   @map("source_url")
   status      String    @default("active") // active, closed, archived
   createdAt   DateTime  @default(now()) @map("created_at")
@@ -80,7 +80,7 @@ model Resume {
   skills      String[]  @default([])
   experience  String?   @db.Text
   education   String?   @db.Text
-  source      String    // e.g. "hh.ru", "linkedin"
+  source      String    // e.g. "work.ua", "linkedin"
   sourceUrl   String?   @map("source_url")
   status      String    @default("new") // new, contact, interview, offer, hired, rejected
   createdAt   DateTime  @default(now()) @map("created_at")

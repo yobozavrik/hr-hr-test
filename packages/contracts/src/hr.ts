@@ -170,7 +170,7 @@ export const dailyDigestSchema = z.object({
 export const searchRequestSchema = z.object({
   text: z.string().min(1),
   type: z.enum(['vacancy', 'resume']).default('vacancy'),
-  source: z.enum(['all', 'hh.ru', 'work.ua', 'robota.ua', 'linkedin']).default('all'),
+  source: z.enum(['all', 'work.ua', 'robota.ua', 'linkedin']).default('all'),
   page: z.coerce.number().min(0).default(0),
   location: z.string().optional(),
 })
@@ -185,7 +185,7 @@ export const searchResultItemSchema = z.object({
   currency: z.string().nullable(),
   description: z.string(),
   url: z.string(),
-  source: z.enum(['hh.ru', 'work.ua', 'robota.ua', 'linkedin']),
+  source: z.enum(['work.ua', 'robota.ua', 'linkedin']),
   skills: z.array(z.string()).optional(),
   candidateName: z.string().optional(),
 })

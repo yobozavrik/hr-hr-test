@@ -8,7 +8,6 @@ import type { Variables } from '../app'
 import { WorkUaScraper } from '../integrations/work-ua.service'
 import { RobotaUaScraper } from '../integrations/robota-ua.service'
 import { LinkedInScraper } from '../integrations/linkedin.service'
-import { HHService } from '../integrations/hh/service'
 import { AIService } from '../integrations/ai.service'
 
 export function createSearchRoutes(db: any) {
@@ -17,7 +16,6 @@ export function createSearchRoutes(db: any) {
   const workScraper = new WorkUaScraper()
   const robotaScraper = new RobotaUaScraper()
   const linkedinScraper = new LinkedInScraper()
-  const hhService = new HHService()
   const aiService = new AIService()
 
   app.use('*', requireAuth)
@@ -59,46 +57,6 @@ export function createSearchRoutes(db: any) {
       )
     }
 
-    // 4. HeadHunter (hh.ru)
-    if (source === 'all' || source === 'hh.ru') {
-      promises.push(
-        (async () => {
-          try {
-            if (type === 'vacancy') {
-              const res = await hhService.searchVacancies({ text, page })
-              return res.items.map((item) => ({
-                id: `hh_${item.id}`,
-                title: item.name,
-                company: item.employer?.name || 'Роботодавець',
-                location: item.area?.name || 'Україна',
-                salaryFrom: item.salary?.from || null,
-                salaryTo: item.salary?.to || null,
-                currency: item.salary?.currency || 'UAH',
-                description: item.snippet?.requirement || item.snippet?.responsibility || 'Опис доступний на сайті.',
-                url: item.alternate_url || `https://hh.ru/vacancy/${item.id}`,
-                source: 'hh.ru' as const,
-              }))
-            } else {
-              // Search resumes on hh.ru
-              const res = await hhService.searchResumes({ text, page })
-              // Since hh.ru resume list contains IDs only, we fetch details if possible or map
-              return res.items.map((item) => ({
-                id: `hh_resume_${item.id}`,
-                title: text,
-                candidateName: 'Шукач hh.ru',
-                location: 'Україна',
-                description: 'Резюме знайдено на hh.ru. Натисніть для детального перегляду.',
-                url: item.url || `https://hh.ru/resume/${item.id}`,
-                source: 'hh.ru' as const,
-              }))
-            }
-          } catch (e) {
-            console.error('HH search failed:', e)
-            return [] // Fail gracefully
-          }
-        })()
-      )
-    }
 
     // Execute searches concurrently
     const resultsArrays = await Promise.all(promises)
