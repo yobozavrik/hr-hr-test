@@ -7,6 +7,7 @@ import { createEmailRoutes } from './email.routes'
 import { createSalaryRoutes } from './salary.routes'
 import { createDigestRoutes } from './digest.routes'
 import { createSearchRoutes } from './search.routes'
+import { createAIRoutes } from './ai.routes'
 
 export function createHRRoutes(db: any) {
   const app = new Hono()
@@ -19,6 +20,7 @@ export function createHRRoutes(db: any) {
   app.route('/salary', createSalaryRoutes(db))
   app.route('/digest', createDigestRoutes(db))
   app.route('/search', createSearchRoutes(db))
+  app.route('/ai', createAIRoutes())
 
   return app
 }

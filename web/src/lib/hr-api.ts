@@ -168,5 +168,18 @@ export class HrApiClient {
   }) {
     return this.request('/api/hr/search/match-analyze', { method: 'POST', body: data })
   }
+
+  // AI Employees endpoints
+  aiGenerateOutreach(data: { candidateName: string; candidatePosition: string; vacancyTitle: string }) {
+    return this.request('/api/hr/ai/outreach', { method: 'POST', body: data })
+  }
+
+  aiAnalyzeSalary(data: { position: string }) {
+    return this.request('/api/hr/ai/salary', { method: 'POST', body: data })
+  }
+
+  aiExpandSearch(data: { text: string }) {
+    return this.request('/api/hr/ai/expand', { method: 'POST', body: data })
+  }
 }
 

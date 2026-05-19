@@ -13,7 +13,7 @@ import type {
   CreateSalaryReportRequest,
 } from '@hr-recruiter/contracts'
 
-function useHrClient() {
+export function useHrClient() {
   const auth = useAuth()
   return new HrApiClient(() => auth.accessToken)
 }

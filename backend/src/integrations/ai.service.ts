@@ -1,3 +1,10 @@
+import {
+  ARTUR_ASSESSMENT_PROMPT,
+  SOFIA_OUTREACH_PROMPT,
+  DANILO_ANALYTICS_PROMPT,
+  MARTA_SOURCING_PROMPT
+} from './prompts'
+
 export interface AIAnalysisResult {
   score: number
   summary: string
@@ -7,11 +14,61 @@ export interface AIAnalysisResult {
   recommendations: string[]
 }
 
+export interface AISofiaOutreachResult {
+  subject: string
+  content: string
+}
+
+export interface AIDaniloSalaryResult {
+  position: string
+  min: number
+  median: number
+  max: number
+  currency: string
+  demand: 'High' | 'Medium' | 'Low'
+  advice: string
+}
+
+export interface AIMartaSourcingResult {
+  expansions: string[]
+  titles: string[]
+  booleanSearch: string
+}
+
 export class AIService {
   private openaiApiKey = process.env.OPENAI_API_KEY || null
   private geminiApiKey = process.env.GEMINI_API_KEY || null
   private groqApiKey = process.env.GROQ_API_KEY || null
 
+  private async executeAIPrompt<T>(prompt: string, fallbackFn: () => T): Promise<T> {
+    if (this.openaiApiKey) {
+      try {
+        return await this.callOpenAI<T>(prompt)
+      } catch (e) {
+        console.error('OpenAI call failed, trying Gemini:', e)
+      }
+    }
+
+    if (this.geminiApiKey) {
+      try {
+        return await this.callGemini<T>(prompt)
+      } catch (e) {
+        console.error('Gemini call failed, trying Groq:', e)
+      }
+    }
+
+    if (this.groqApiKey) {
+      try {
+        return await this.callGroq<T>(prompt)
+      } catch (e) {
+        console.error('Groq call failed, running local rules-based fallback:', e)
+      }
+    }
+
+    return fallbackFn()
+  }
+
+  // Artur - Assessment
   async analyzeMatch(params: {
     vacancyTitle: string
     vacancyDescription: string
@@ -21,66 +78,82 @@ export class AIService {
     candidateExperience?: string
     candidateEducation?: string
   }): Promise<AIAnalysisResult> {
-    const prompt = this.buildPrompt(params)
+    const prompt = `
+${ARTUR_ASSESSMENT_PROMPT}
 
-    // Try OpenAI if key is present
-    if (this.openaiApiKey) {
-      try {
-        return await this.callOpenAI(prompt)
-      } catch (e) {
-        console.error('OpenAI match analysis failed, trying fallbacks:', e)
-      }
-    }
+VACANCY:
+Title: ${params.vacancyTitle}
+Description: ${params.vacancyDescription}
 
-    // Try Gemini if key is present
-    if (this.geminiApiKey) {
-      try {
-        return await this.callGemini(prompt)
-      } catch (e) {
-        console.error('Gemini match analysis failed, trying fallbacks:', e)
-      }
-    }
-
-    // Try Groq if key is present
-    if (this.groqApiKey) {
-      try {
-        return await this.callGroq(prompt)
-      } catch (e) {
-        console.error('Groq match analysis failed, trying fallbacks:', e)
-      }
-    }
-
-    // Fallback to rules-based analysis if no API key is available
-    return this.fallbackRulesBasedAnalysis(params)
+CANDIDATE:
+Name: ${params.candidateName}
+Desired Position: ${params.candidatePosition}
+Skills: ${params.candidateSkills.join(', ')}
+Experience: ${params.candidateExperience || 'Not specified'}
+Education: ${params.candidateEducation || 'Not specified'}
+`
+    return this.executeAIPrompt<AIAnalysisResult>(prompt, () => this.fallbackRulesBasedAnalysis(params))
   }
 
-  private buildPrompt(params: any): string {
-    return `Проаналізуй відповідність кандидата вимогам вакансії.
-    
-ВАКАНСІЯ:
-Назва: ${params.vacancyTitle}
-Опис: ${params.vacancyDescription}
+  // Sofia - Outreach
+  async generateOutreach(params: {
+    candidateName: string
+    candidatePosition: string
+    vacancyTitle: string
+  }): Promise<AISofiaOutreachResult> {
+    const prompt = `
+${SOFIA_OUTREACH_PROMPT}
 
-КАНДИДАТ:
-Ім'я: ${params.candidateName}
-Бажана посада: ${params.candidatePosition}
-Ключові навички: ${params.candidateSkills.join(', ')}
-Досвід роботи: ${params.candidateExperience || 'Не вказано'}
-Освіта: ${params.candidateEducation || 'Не вказано'}
-
-Поверни результат ВИКЛЮЧНО в форматі JSON з наступними полями:
-{
-  "score": <число від 0 до 100>,
-  "summary": "<коротке резюме відповідності українською мовою, 2-3 речення>",
-  "pros": ["<перевага 1>", "<перевага 2>", ...],
-  "cons": ["<недолік/ризик 1>", "<недолік/ризик 2>", ...],
-  "verdict": "strong_match" | "potential_match" | "no_match",
-  "recommendations": ["<рекомендація/питання для інтерв'ю 1>", "<питання 2>", ...]
-}
-Жодного зайвого тексту поза JSON, розмітки \`\`\`json або інших пояснень. Тільки чистий JSON.`
+CANDIDATE NAME: ${params.candidateName}
+CANDIDATE POSITION: ${params.candidatePosition}
+VACANCY TITLE: ${params.vacancyTitle}
+`
+    return this.executeAIPrompt<AISofiaOutreachResult>(prompt, () => ({
+      subject: `Пропозиція співпраці: позиція "${params.vacancyTitle}"`,
+      content: `Шановний ${params.candidateName || 'кандидате'},\n\nМене звати Софія, я ІІ-Координатор. Ми переглянули ваше резюме на позицію "${params.candidatePosition}" і вважаємо, що ваші навички ідеально відповідають вакансії "${params.vacancyTitle}".\n\nБудемо раді поспілкуватися на короткому інтерв'ю!\n\nЗ повагою,\nСофія.`
+    }))
   }
 
-  private async callOpenAI(prompt: string): Promise<AIAnalysisResult> {
+  // Danilo - Salary Analytics
+  async analyzeSalary(params: {
+    position: string
+  }): Promise<AIDaniloSalaryResult> {
+    const prompt = `
+${DANILO_ANALYTICS_PROMPT}
+
+ROLE TO ANALYZE: ${params.position}
+`
+    return this.executeAIPrompt<AIDaniloSalaryResult>(prompt, () => {
+      const baseSalary = params.position.toLowerCase().includes('senior') ? 4000 : params.position.toLowerCase().includes('junior') ? 1000 : 2500
+      return {
+        position: params.position,
+        min: baseSalary - Math.round(baseSalary * 0.2),
+        median: baseSalary,
+        max: baseSalary + Math.round(baseSalary * 0.3),
+        currency: 'USD',
+        demand: params.position.toLowerCase().includes('react') || params.position.toLowerCase().includes('node') ? 'High' : 'Medium',
+        advice: `Рекомендується орієнтуватися на бюджет $${baseSalary} для зменшення терміну закриття вакансії.`
+      }
+    })
+  }
+
+  // Marta - Sourcing Query Expander
+  async expandSearchQuery(params: {
+    text: string
+  }): Promise<AIMartaSourcingResult> {
+    const prompt = `
+${MARTA_SOURCING_PROMPT}
+
+SEARCH TEXT: ${params.text}
+`
+    return this.executeAIPrompt<AIMartaSourcingResult>(prompt, () => ({
+      expansions: [params.text, `${params.text} Developer`, `Software Engineer ${params.text}`],
+      titles: [params.text, `${params.text} Developer`],
+      booleanSearch: `"${params.text}" AND ("developer" OR "engineer")`
+    }))
+  }
+
+  private async callOpenAI<T>(prompt: string): Promise<T> {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -101,10 +174,10 @@ export class AIService {
 
     const data = await response.json() as any
     const content = data.choices[0].message.content
-    return JSON.parse(content) as AIAnalysisResult
+    return JSON.parse(content) as T
   }
 
-  private async callGemini(prompt: string): Promise<AIAnalysisResult> {
+  private async callGemini<T>(prompt: string): Promise<T> {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`, {
       method: 'POST',
       headers: {
@@ -124,10 +197,10 @@ export class AIService {
 
     const data = await response.json() as any
     const content = data.candidates[0].content.parts[0].text
-    return JSON.parse(content) as AIAnalysisResult
+    return JSON.parse(content) as T
   }
 
-  private async callGroq(prompt: string): Promise<AIAnalysisResult> {
+  private async callGroq<T>(prompt: string): Promise<T> {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -148,7 +221,7 @@ export class AIService {
 
     const data = await response.json() as any
     const content = data.choices[0].message.content
-    return JSON.parse(content) as AIAnalysisResult
+    return JSON.parse(content) as T
   }
 
   private fallbackRulesBasedAnalysis(params: any): AIAnalysisResult {

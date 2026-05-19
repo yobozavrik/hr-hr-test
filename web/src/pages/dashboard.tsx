@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/lib/use-auth'
-import { useDailyDigest, useVacancies, useResumes, useUpcomingTasks, useMatches } from '@/hooks/use-hr'
+import { useDailyDigest, useVacancies, useResumes, useUpcomingTasks, useMatches, useHrClient } from '@/hooks/use-hr'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
@@ -30,6 +30,7 @@ export function DashboardPage() {
   const tasks = useUpcomingTasks()
   const matches = useMatches()
   const navigate = useNavigate()
+  const client = useHrClient()
 
   const [selectedAgent, setSelectedAgent] = useState<AIEmployee | null>(null)
   const [taskParam1, setTaskParam1] = useState('')
@@ -121,68 +122,100 @@ export function DashboardPage() {
     setLoadingSimulation(false)
   }
 
-  const handleExecuteTask = () => {
+  const handleExecuteTask = async () => {
     if (!selectedAgent) return
 
-    if (selectedAgent.id === 'marta') {
-      // Sourcing task: redirect directly to search page with prefilled params
-      navigate({
-        to: '/app/search',
-        search: {
-          text: taskParam1 || 'React',
-          type: 'vacancy',
-          source: 'all',
-          page: 0
-        }
-      })
-      setSelectedAgent(null)
-    } else {
-      // Simulate active AI processing state
-      setLoadingSimulation(true)
-      setTimeout(() => {
-        setLoadingSimulation(false)
-        if (selectedAgent.id === 'sofia') {
-          setSimulationResult({
-            type: 'email',
-            subject: `Пропозиція співпраці: позиція "${taskParam2 || 'React Developer'}"`,
-            content: `Шановний ${taskParam1 || 'кандидате'},\n\n` +
-              `Мене звати Софія, я ІІ-Координатор компанії. Ми переглянули ваше резюме на позицію "${taskParam2 || 'React Developer'}" і воно нас надзвичайно зацікавило.\n\n` +
-              `Ваш досвід та технічні навички дуже добре відповідають вимогам нашої команди. Ми б хотіли запросити вас на коротке ознайомче інтерв'ю (15-20 хвилин), щоб детальніше обговорити можливості нашої співпраці.\n\n` +
-              `Будь ласка, повідомте, які дні та години цього тижня будуть для вас зручними для дзвінка.\n\n` +
-              `З повагою,\nСофія та HR-команда`
-          })
-        } else if (selectedAgent.id === 'danilo') {
-          const baseSalary = taskParam1.toLowerCase().includes('senior') ? 4000 : taskParam1.toLowerCase().includes('junior') ? 1000 : 2500
-          setSimulationResult({
-            type: 'salary',
-            position: taskParam1 || 'React Developer',
-            min: baseSalary - Math.round(baseSalary * 0.2),
-            median: baseSalary,
-            max: baseSalary + Math.round(baseSalary * 0.3),
-            currency: 'USD',
-            demand: taskParam1.toLowerCase().includes('react') || taskParam1.toLowerCase().includes('node') ? 'Високий' : 'Середній',
-            advice: `Рекомендується орієнтуватися на бюджет $${baseSalary} для зменшення терміну закриття вакансії.`
-          })
-        } else if (selectedAgent.id === 'artur') {
-          setSimulationResult({
-            type: 'assessment',
-            score: 85,
-            pros: [
-              'Глибоке знання основного стека (TypeScript/React)',
-              'Досвід роботи з RESTful API та оптимізацією інтерфейсів',
-              'Розуміння CI/CD процесів'
-            ],
-            cons: [
-              'Недостатній досвід роботи з Docker контейнеризацією',
-              'Рідкісна участь в архітектурному плануванні на попередніх проектах'
-            ],
-            questions: [
-              'Розкажіть про свій досвід оптимізації рендерингу складних React-компонентів.',
-              'Як ви органісовуєте управління глобальним станом у великих додатках?'
-            ]
-          })
-        }
-      }, 1500)
+    setLoadingSimulation(true)
+    setSimulationResult(null)
+
+    try {
+      if (selectedAgent.id === 'marta') {
+        const res = await client.aiExpandSearch({ text: taskParam1 || 'React' })
+        setSimulationResult({
+          type: 'sourcing',
+          ...res
+        })
+      } else if (selectedAgent.id === 'sofia') {
+        const res = await client.aiGenerateOutreach({
+          candidateName: taskParam1 || 'Олександр Коваленко',
+          candidatePosition: taskParam2 || 'React Developer',
+          vacancyTitle: taskParam2 || 'React Developer'
+        })
+        setSimulationResult({
+          type: 'email',
+          ...res
+        })
+      } else if (selectedAgent.id === 'danilo') {
+        const res = await client.aiAnalyzeSalary({
+          position: taskParam1 || 'React Developer'
+        })
+        setSimulationResult({
+          type: 'salary',
+          ...res
+        })
+      } else if (selectedAgent.id === 'artur') {
+        const res = await client.analyzeMatch({
+          vacancy: { title: taskParam1 || 'React Developer', description: 'Необхідні навички: React, TypeScript, Node.js' },
+          resume: { name: 'Кандидат', position: taskParam1 || 'React Developer', skills: ['React', 'TypeScript'] }
+        })
+        setSimulationResult({
+          type: 'assessment',
+          ...res
+        })
+      }
+    } catch (e) {
+      console.warn('API call failed or key missing, falling back to simulated output:', e)
+      // Fallbacks
+      if (selectedAgent.id === 'sofia') {
+        setSimulationResult({
+          type: 'email',
+          subject: `Пропозиція співпраці: позиція "${taskParam2 || 'React Developer'}"`,
+          content: `Шановний ${taskParam1 || 'кандидате'},\n\n` +
+            `Мене звати Софія, я ІІ-Координатор компанії. Ми переглянули ваше резюме на позицію "${taskParam2 || 'React Developer'}" і воно нас надзвичайно зацікавило.\n\n` +
+            `Ваш досвід та технічні навички дуже добре відповідають вимогам нашої команди. Ми б хотіли запросити вас на коротке ознайомче інтерв'ю (15-20 хвилин), щоб детальніше обговорити можливості нашої співпраці.\n\n` +
+            `Будь ласка, повідомте, які дні та години цього тижня будуть для вас зручними для дзвінка.\n\n` +
+            `З повагою,\nСофія та HR-команда`
+        })
+      } else if (selectedAgent.id === 'danilo') {
+        const baseSalary = taskParam1.toLowerCase().includes('senior') ? 4000 : taskParam1.toLowerCase().includes('junior') ? 1000 : 2500
+        setSimulationResult({
+          type: 'salary',
+          position: taskParam1 || 'React Developer',
+          min: baseSalary - Math.round(baseSalary * 0.2),
+          median: baseSalary,
+          max: baseSalary + Math.round(baseSalary * 0.3),
+          currency: 'USD',
+          demand: taskParam1.toLowerCase().includes('react') || taskParam1.toLowerCase().includes('node') ? 'Високий' : 'Середній',
+          advice: `Рекомендується орієнтуватися на бюджет $${baseSalary} для зменшення терміну закриття вакансії.`
+        })
+      } else if (selectedAgent.id === 'artur') {
+        setSimulationResult({
+          type: 'assessment',
+          score: 85,
+          pros: [
+            'Глибоке знання основного стека (TypeScript/React)',
+            'Досвід роботи з RESTful API та оптимізацією інтерфейсів',
+            'Розуміння CI/CD процесів'
+          ],
+          cons: [
+            'Недостатній досвід роботи з Docker контейнеризацією',
+            'Рідкісна участь в архітектурному плануванні на попередніх проектах'
+          ],
+          questions: [
+            'Розкажіть про свій досвід оптимізації рендерингу складних React-компонентів.',
+            'Як ви організовуєте управління глобальним станом у великих додатках?'
+          ]
+        })
+      } else if (selectedAgent.id === 'marta') {
+        setSimulationResult({
+          type: 'sourcing',
+          expansions: [taskParam1 || 'React', 'ReactJS', 'React Native', 'React.js'],
+          titles: [`${taskParam1 || 'React'} Developer`, `Software Engineer ${taskParam1 || 'React'}`],
+          booleanSearch: `"${taskParam1 || 'React'}" AND ("developer" OR "engineer")`
+        })
+      }
+    } finally {
+      setLoadingSimulation(false)
     }
   }
 
@@ -529,6 +562,53 @@ export function DashboardPage() {
                           </ol>
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {simulationResult.type === 'sourcing' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b pb-1.5 font-semibold text-sm">
+                        <span className="text-foreground">Сорсинг запит розширено</span>
+                        <Badge variant="outline" className="bg-blue-500/10 text-blue-400">Розширення пошуку</Badge>
+                      </div>
+                      <div className="space-y-2 text-left text-xs text-muted-foreground">
+                        <div>
+                          <span className="font-semibold text-card-foreground">Синоніми та розширення:</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {simulationResult.expansions?.map((term: string, i: number) => (
+                              <Badge key={i} variant="secondary" className="text-[10px]">{term}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-card-foreground">Суміжні посади:</span>
+                          <ul className="list-disc pl-4 mt-1 space-y-1">
+                            {simulationResult.titles?.map((title: string, i: number) => (
+                              <li key={i}>{title}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-card-foreground">Boolean рядок пошуку:</span>
+                          <code className="block bg-black/20 p-2 rounded mt-1 font-mono text-[10px] select-all cursor-pointer">
+                            {simulationResult.booleanSearch}
+                          </code>
+                        </div>
+                      </div>
+                      <Button onClick={() => {
+                        navigate({
+                          to: '/app/search',
+                          search: {
+                            text: taskParam1 || 'React',
+                            type: 'vacancy',
+                            source: 'all',
+                            page: 0
+                          }
+                        })
+                        setSelectedAgent(null)
+                      }} className="w-full mt-2" size="sm">
+                        Перейти до результатів пошуку
+                      </Button>
                     </div>
                   )}
                 </div>
