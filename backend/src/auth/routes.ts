@@ -9,7 +9,7 @@ import {
   registerRequestSchema,
 } from '@hr-recruiter/contracts'
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
-import type { Context } from 'hono'
+import type { Context, Next } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 import type { AppEnv } from '../env'
@@ -180,7 +180,10 @@ const logoutRoute = createRoute({
   },
 })
 
-export async function requireAuth(c: any, next: any) {
+export async function requireAuth(
+  c: Context<{ Variables: Variables & { authService: AuthService } }>,
+  next: Next,
+) {
   const auth = c.get('authService')
   const token = bearerToken(c)
   

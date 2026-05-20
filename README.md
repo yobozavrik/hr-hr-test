@@ -10,9 +10,6 @@ HR-рекрутер с ИИ-ассистентом для автоматизац
 - **AI-матчинг** — автоматическое сопоставление вакансий и резюме по позиции, зарплате и навыкам
 - **Сравнение ЗП** — анализ средних зарплат по рынку
 - **Ежедневные сводки** — утренние дайджесты новых вакансий, резюме и матчей (cron job)
-- **Google Calendar** — автоматическое создание задач и встреч
-- **Google Sheets** — экспорт данных в таблицы
-- **Gmail интеграция** — отправка и просмотр писем
 - **Email SMTP** — отправка писем через SMTP
 - **Отчеты** — аналитика по закрытию вакансий
 
@@ -42,13 +39,6 @@ HR-рекрутер с ИИ-ассистентом для автоматизац
 - `GET/POST /api/hr/emails` — email логи
 - `GET /api/hr/digest/daily` — ежедневная сводка
 
-### Google Integrations
-- `GET /api/google/auth-url/:scope` — URL для авторизации (calendar/sheets/gmail)
-- `POST /api/google/callback` — callback после авторизации
-- `GET /api/google/status` — статус подключения
-- `POST/GET /api/google/calendar/events` — Calendar API
-- `POST /api/google/sheets` — Sheets API
-- `POST /api/google/gmail/send` — Gmail API
 
 ## Быстрый старт
 
@@ -89,8 +79,6 @@ vercel --prod
 1. Добавьте Environment Variables:
    - `DATABASE_URL` — URL PostgreSQL на VPS
    - `JWT_SECRET` — случайный секрет (openssl rand -hex 32)
-   - `GOOGLE_CLIENT_ID` — из Google Cloud Console
-   - `GOOGLE_CLIENT_SECRET` — из Google Cloud Console
    - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`
    - `OPENAI_API_KEY` — для AI анализа
 
@@ -118,7 +106,6 @@ bun run --cwd backend prisma:deploy
 ### Основные таблицы:
 - `users` — пользователи
 - `auth_sessions` — сессии авторизации
-- `google_tokens` — Google OAuth токены
 - `vacancies` — вакансии
 - `resumes` — резюме кандидатов
 - `matches` — сопоставления вакансий и резюме

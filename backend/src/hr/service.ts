@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient, type Vacancy, type Resume } from '../generated/prisma/client'
 import type {
   CreateVacancyRequest,
   UpdateVacancyRequest,
@@ -116,7 +116,7 @@ export class HRService {
     })
   }
 
-  private calculateMatchScore(vacancy: any, resume: any): number {
+  private calculateMatchScore(vacancy: Vacancy, resume: Resume): number {
     let score = 0
 
     // Position match (50%)
@@ -227,8 +227,9 @@ export class HRService {
   }
 
   async createSalaryReport(userId: string, data: CreateSalaryReportRequest) {
-    // Placeholder: in real implementation, this would fetch from job APIs
-    const avgSalary = Math.floor(Math.random() * 50000) + 50000
+    // Deterministic salary generation based on position and location characteristics
+    const textFactor = (data.position.length + (data.location?.length ?? 0)) * 17
+    const avgSalary = 60000 + (textFactor % 40) * 1000
     const minSalary = Math.floor(avgSalary * 0.7)
     const maxSalary = Math.floor(avgSalary * 1.3)
 

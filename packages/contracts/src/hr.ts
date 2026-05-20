@@ -89,6 +89,10 @@ export const createMatchRequestSchema = z.object({
   resumeId: z.string(),
 })
 
+export const updateMatchRequestSchema = z.object({
+  status: z.enum(['pending', 'approved', 'rejected']),
+})
+
 // Task schemas
 export const taskSchema = z.object({
   id: z.string(),
@@ -203,6 +207,7 @@ export type UpdateResumeRequest = z.infer<typeof updateResumeRequestSchema>
 
 export type Match = z.infer<typeof matchSchema>
 export type CreateMatchRequest = z.infer<typeof createMatchRequestSchema>
+export type UpdateMatchRequest = z.infer<typeof updateMatchRequestSchema>
 
 export type Task = z.infer<typeof taskSchema>
 export type CreateTaskRequest = z.infer<typeof createTaskRequestSchema>

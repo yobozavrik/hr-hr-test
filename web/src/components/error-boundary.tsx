@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 
 interface Props {
   children: ReactNode
@@ -32,7 +33,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <Card className="w-full max-w-md border-destructive/20 bg-destructive/5">
             <CardHeader>
               <CardTitle className="text-destructive flex items-center gap-2">
-                <span>⚠️ Щось пішло не так</span>
+                ⚠️ Щось пішло не так
               </CardTitle>
               <CardDescription>
                 Сталася непередбачена помилка в інтерфейсі.
@@ -40,9 +41,13 @@ export class ErrorBoundary extends Component<Props, State> {
             </CardHeader>
             <CardContent className="space-y-4">
               {this.state.error && (
-                <pre className="max-h-40 overflow-auto rounded bg-zinc-950 p-3 text-xs text-zinc-300 font-mono">
+                <Typography
+                  as="pre"
+                  variant="code"
+                  className="max-h-40 overflow-auto rounded bg-zinc-950 p-3 text-zinc-300"
+                >
                   {this.state.error.message}
-                </pre>
+                </Typography>
               )}
               <Button
                 variant="outline"

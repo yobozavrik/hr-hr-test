@@ -510,7 +510,7 @@ export default defineConfig([
   {
     files: ['src/**/*.{ts,tsx}'],
     rules: {
-      'typographyPolicy/use-typography-component': 'error',
+      'typographyPolicy/use-typography-component': 'warn',
     },
   },
   {

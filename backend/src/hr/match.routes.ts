@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { createMatchRequestSchema } from '@hr-recruiter/contracts'
+import { createMatchRequestSchema, updateMatchRequestSchema } from '@hr-recruiter/contracts'
 import { HRService } from './service'
 import { requireAuth } from '../auth/routes'
 import type { Variables } from '../app'
@@ -31,10 +31,10 @@ export function createMatchRoutes(db: DbClient) {
     }
   })
 
-  app.patch('/:id', async (c) => {
+  app.patch('/:id', zValidator('json', updateMatchRequestSchema), async (c) => {
     const user = c.get('user')
     const id = c.req.param('id')
-    const { status } = await c.req.json()
+    const { status } = c.req.valid('json')
 
     try {
       const match = await service.updateMatch(user.id, id, status)

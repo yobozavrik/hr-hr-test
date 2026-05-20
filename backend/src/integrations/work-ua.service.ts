@@ -3,24 +3,27 @@ import { JobBoardScraper, ScrapedItem, ScraperSearchParams } from './scraper.int
 export class WorkUaScraper implements JobBoardScraper {
   private baseUrl = 'https://www.work.ua'
 
+  private async fetchHtml(url: string, contextName: string): Promise<string> {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,uk;q=0.6',
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`Work.ua ${contextName} failed with status ${response.status}`)
+    }
+
+    return response.text()
+  }
+
   async searchVacancies(params: ScraperSearchParams): Promise<ScrapedItem[]> {
     const page = params.page ? params.page + 1 : 1
     const searchUrl = `${this.baseUrl}/jobs/?search=${encodeURIComponent(params.text)}&page=${page}`
     
     try {
-      const response = await fetch(searchUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,uk;q=0.6',
-        }
-      })
-
-      if (!response.ok) {
-        console.error(`Work.ua search failed with status ${response.status}`)
-        return []
-      }
-
-      const html = await response.text()
+      const html = await this.fetchHtml(searchUrl, 'search')
       return this.parseVacancyHtml(html)
     } catch (error) {
       console.error('Error fetching Work.ua vacancies:', error)
@@ -33,19 +36,7 @@ export class WorkUaScraper implements JobBoardScraper {
     const searchUrl = `${this.baseUrl}/resumes/?search=${encodeURIComponent(params.text)}&page=${page}`
     
     try {
-      const response = await fetch(searchUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,uk;q=0.6',
-        }
-      })
-
-      if (!response.ok) {
-        console.error(`Work.ua resume search failed with status ${response.status}`)
-        return []
-      }
-
-      const html = await response.text()
+      const html = await this.fetchHtml(searchUrl, 'resume search')
       return this.parseResumeHtml(html)
     } catch (error) {
       console.error('Error fetching Work.ua resumes:', error)

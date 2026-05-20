@@ -1,6 +1,12 @@
 import { Hono } from 'hono'
-import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
+import {
+  aiGenerateOutreachRequestSchema,
+  aiAnalyzeSalaryRequestSchema,
+  aiExpandSearchRequestSchema,
+  aiTrackSalaryRequestSchema,
+  aiTrackCompetitorsRequestSchema,
+} from '@hr-recruiter/contracts'
 import { AIService } from '../integrations/ai.service'
 import { requireAuth } from '../auth/routes'
 import type { Variables } from '../app'
@@ -15,14 +21,7 @@ export function createAIRoutes() {
   // Sofia Outreach Email Generator
   app.post(
     '/outreach',
-    zValidator(
-      'json',
-      z.object({
-        candidateName: z.string().min(1),
-        candidatePosition: z.string().min(1),
-        vacancyTitle: z.string().min(1)
-      })
-    ),
+    zValidator('json', aiGenerateOutreachRequestSchema),
     async (c) => {
       const { candidateName, candidatePosition, vacancyTitle } = c.req.valid('json')
       const result = await aiService.generateOutreach({
@@ -37,12 +36,7 @@ export function createAIRoutes() {
   // Danilo Salary Analytics
   app.post(
     '/salary',
-    zValidator(
-      'json',
-      z.object({
-        position: z.string().min(1)
-      })
-    ),
+    zValidator('json', aiAnalyzeSalaryRequestSchema),
     async (c) => {
       const { position } = c.req.valid('json')
       const result = await aiService.analyzeSalary({ position })
@@ -53,12 +47,7 @@ export function createAIRoutes() {
   // Marta Search Query Expander
   app.post(
     '/expand',
-    zValidator(
-      'json',
-      z.object({
-        text: z.string().min(1)
-      })
-    ),
+    zValidator('json', aiExpandSearchRequestSchema),
     async (c) => {
       const { text } = c.req.valid('json')
       const result = await aiService.expandSearchQuery({ text })
@@ -69,13 +58,7 @@ export function createAIRoutes() {
   // Maksym Salary Tracker
   app.post(
     '/salary-track',
-    zValidator(
-      'json',
-      z.object({
-        position: z.string().min(1),
-        budget: z.number().positive()
-      })
-    ),
+    zValidator('json', aiTrackSalaryRequestSchema),
     async (c) => {
       const { position, budget } = c.req.valid('json')
       const result = await aiService.trackSalary({ position, budget })
@@ -86,13 +69,7 @@ export function createAIRoutes() {
   // Olena Competitor Tracker
   app.post(
     '/competitors',
-    zValidator(
-      'json',
-      z.object({
-        company: z.string().min(1),
-        niche: z.string().min(1)
-      })
-    ),
+    zValidator('json', aiTrackCompetitorsRequestSchema),
     async (c) => {
       const { company, niche } = c.req.valid('json')
       const result = await aiService.trackCompetitors({ company, niche })

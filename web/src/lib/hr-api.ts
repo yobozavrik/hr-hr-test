@@ -14,16 +14,18 @@ const apiBaseUrl = (import.meta.env?.VITE_API_URL ?? 'http://localhost:3000').re
 
 export class HrApiClient {
   private getAccessToken: () => string | null
+  private platform: 'web' | 'mobile'
 
-  constructor(getAccessToken: () => string | null) {
+  constructor(getAccessToken: () => string | null, platform: 'web' | 'mobile' = 'web') {
     this.getAccessToken = getAccessToken
+    this.platform = platform
   }
 
   private async request(path: string, options: { method?: string; body?: unknown } = {}) {
     const token = this.getAccessToken()
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'X-Client-Platform': 'web',
+      'X-Client-Platform': this.platform,
     }
     if (token) {
       headers['Authorization'] = `Bearer ${token}`

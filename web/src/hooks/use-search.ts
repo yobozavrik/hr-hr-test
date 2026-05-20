@@ -1,10 +1,11 @@
+import { useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/lib/use-auth'
 import { HrApiClient } from '@/lib/hr-api'
 
 function useHrClient() {
   const auth = useAuth()
-  return new HrApiClient(() => auth.accessToken)
+  return useMemo(() => new HrApiClient(() => auth.accessToken), [auth.accessToken])
 }
 
 // Save vacancy to our database
@@ -77,10 +78,11 @@ export function useJobBoardSearch(params: {
   location?: string
 }) {
   const client = useHrClient()
+  const auth = useAuth()
   return useQuery({
     queryKey: ['search', 'multi', params],
     queryFn: () => client.search(params),
-    enabled: !!params.text && !!useAuth().accessToken,
+    enabled: !!params.text && !!auth.accessToken,
   })
 }
 
