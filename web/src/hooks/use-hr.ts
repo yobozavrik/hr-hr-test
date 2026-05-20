@@ -214,4 +214,32 @@ export function useSendEmail() {
   })
 }
 
+// Agent Chat
+export function useAgentConfigs() {
+  const client = useHrClient()
+  return useQuery({
+    queryKey: ['agent-configs'],
+    queryFn: () => client.getAgentConfigs(),
+    enabled: !!useAuth().accessToken,
+  })
+}
+
+export function useAgentChat() {
+  const client = useHrClient()
+  return useMutation({
+    mutationFn: (data: { agentId: string; messages: { role: string; content: string }[]; vacancyId?: string; resumeId?: string }) =>
+      client.chatWithAgent(data),
+  })
+}
+
+export function useAnalyzeMatchLLM() {
+  const client = useHrClient()
+  return useMutation({
+    mutationFn: (data: {
+      vacancy: { title: string; company?: string; location?: string; salaryFrom?: number; salaryTo?: number; description?: string; requirements?: string[] }
+      resume: { fullName: string; position?: string; skills?: string[]; experience?: string; education?: string; salary?: string }
+    }) => client.analyzeMatchLLM(data),
+  })
+}
+
 

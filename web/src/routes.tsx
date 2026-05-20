@@ -4,6 +4,9 @@ import { RootLayout } from './pages/layout'
 import { HomePage } from './pages/home'
 import { DashboardPage, VacanciesPage, ResumesPage, MatchesPage, TasksPage, AnalyticsPage, AgentsPage } from './pages'
 import { SearchPage } from './pages/search'
+import { EmailPage } from './pages/email'
+import { SettingsPage } from './pages/settings'
+import { NotFoundPage, ServerErrorPage } from './pages/error-pages'
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -63,6 +66,30 @@ const agentsRoute = createRoute({
   component: AgentsPage,
 })
 
+const emailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/app/email',
+  component: EmailPage,
+})
+
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/app/settings',
+  component: SettingsPage,
+})
+
+const notFoundRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/404',
+  component: NotFoundPage,
+})
+
+const serverErrorRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/500',
+  component: ServerErrorPage,
+})
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   dashboardRoute,
@@ -73,6 +100,10 @@ const routeTree = rootRoute.addChildren([
   searchRoute,
   analyticsRoute,
   agentsRoute,
+  emailRoute,
+  settingsRoute,
+  notFoundRoute,
+  serverErrorRoute,
 ])
 
 export const router = createRouter({ routeTree })

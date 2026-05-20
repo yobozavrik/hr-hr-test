@@ -207,5 +207,21 @@ export class HrApiClient {
   updateAgentTask(agentId: string, taskId: string, data: { status: string; outputResult?: string; durationMs?: number }) {
     return this.request(`/api/hr/agents/tasks/${agentId}/${taskId}`, { method: 'PATCH', body: data })
   }
+
+  // Agent Chat API
+  getAgentConfigs() {
+    return this.request('/api/hr/agents-chat/configs')
+  }
+
+  chatWithAgent(data: { agentId: string; messages: { role: string; content: string }[]; vacancyId?: string; resumeId?: string }) {
+    return this.request('/api/hr/agents-chat/chat', { method: 'POST', body: data })
+  }
+
+  analyzeMatchLLM(data: {
+    vacancy: { title: string; company?: string; location?: string; salaryFrom?: number; salaryTo?: number; description?: string; requirements?: string[] }
+    resume: { fullName: string; position?: string; skills?: string[]; experience?: string; education?: string; salary?: string }
+  }) {
+    return this.request('/api/hr/agents-chat/analyze-match', { method: 'POST', body: data })
+  }
 }
 

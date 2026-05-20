@@ -11,7 +11,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "echo 'Run: bun run dev:backend && bun run dev:web'",
+    "dev": "bun run scripts/dev-all.ts",
     "dev:web": "bun run --cwd web dev",
     "dev:landing": "bun run --cwd landing dev",
     "dev:mobile": "bun run --cwd mobile dev",

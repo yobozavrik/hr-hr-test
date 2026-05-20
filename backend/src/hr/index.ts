@@ -9,6 +9,7 @@ import { createDigestRoutes } from './digest.routes'
 import { createSearchRoutes } from './search.routes'
 import { createAIRoutes } from './ai.routes'
 import { createAgentRoutes } from './agent.routes'
+import { createAgentChatRoutes } from './agent-chat.routes'
 import { createAgentExecRoutes } from '../agents.routes'
 
 import type { DbClient } from '../db'
@@ -26,6 +27,7 @@ export function createHRRoutes(db: DbClient) {
   app.route('/search', createSearchRoutes(db))
   app.route('/ai', createAIRoutes())
   app.route('/agents', createAgentRoutes(db))
+  app.route('/agents-chat', createAgentChatRoutes(db))
   app.route('/agents-exec', createAgentExecRoutes(db))
 
   return app

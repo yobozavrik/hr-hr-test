@@ -7,16 +7,72 @@ import { Spinner } from '@/components/ui/spinner'
 import { Typography } from '@/components/ui/typography'
 import { useAuth } from '@/lib/use-auth'
 
+const features = [
+  {
+    title: 'AI-матчинг',
+    description: 'Точний підбір кандидатів на основі навичок та досвіду.',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2a10 10 0 1 0 10 10H12V2z" />
+        <path d="M12 2a10 10 0 0 1 10 10" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    ),
+    color: 'text-indigo-600',
+    bg: 'bg-indigo-50 dark:bg-indigo-950/30',
+    hoverBg: 'group-hover:bg-indigo-600 group-hover:text-white',
+  },
+  {
+    title: 'Пошук резюме',
+    description: 'Інтелектуальний пошук по Work.ua, Robota.ua, LinkedIn.',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+    ),
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+    hoverBg: 'group-hover:bg-emerald-600 group-hover:text-white',
+  },
+  {
+    title: 'Аналітика',
+    description: 'Детальні звіти по воронці найму та ефективності.',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 3v18h18" />
+        <path d="m19 9-5 5-4-4-3 3" />
+      </svg>
+    ),
+    color: 'text-amber-600',
+    bg: 'bg-amber-50 dark:bg-amber-950/30',
+    hoverBg: 'group-hover:bg-amber-600 group-hover:text-white',
+  },
+  {
+    title: 'Google інтеграції',
+    description: 'Calendar, Sheets, Gmail — синхронізація в реальному часі.',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+        <line x1="16" x2="16" y1="2" y2="6" />
+        <line x1="8" x2="8" y1="2" y2="6" />
+        <line x1="3" x2="21" y1="10" y2="10" />
+      </svg>
+    ),
+    color: 'text-zinc-600 dark:text-zinc-400',
+    bg: 'bg-zinc-100 dark:bg-zinc-800',
+    hoverBg: 'group-hover:bg-zinc-800 group-hover:text-white dark:group-hover:bg-zinc-200 dark:group-hover:text-zinc-900',
+  },
+]
+
 export function HomePage() {
   const auth = useAuth()
 
   if (auth.isBootstrapping) {
     return (
-      <div className="min-h-screen w-full bg-surface text-on-surface font-body text-body antialiased flex items-center justify-center relative overflow-x-hidden p-md lg:p-xl">
-        <div className="fixed top-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-primary-fixed opacity-30 blur-[100px] pointer-events-none" />
-        <div className="fixed bottom-[-10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-secondary-fixed opacity-30 blur-[80px] pointer-events-none" />
-        <Card className="w-fit z-10 bg-surface-container-lowest/80 backdrop-blur-md border-outline-variant shadow-lg">
-          <CardContent className="flex items-center gap-3 p-md">
+      <div className="flex min-h-svh items-center justify-center bg-background">
+        <Card className="w-fit">
+          <CardContent className="flex items-center gap-3 p-6">
             <Spinner />
             <Typography variant="bodySm" tone="muted">
               Перевірка сесії...
@@ -29,176 +85,83 @@ export function HomePage() {
 
   if (auth.user) {
     return (
-      <div className="min-h-screen w-full bg-surface text-on-surface antialiased flex items-center justify-center relative overflow-x-hidden p-md lg:p-xl">
-        <div className="fixed top-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-primary-fixed opacity-30 blur-[100px] pointer-events-none" />
-        <div className="fixed bottom-[-10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-secondary-fixed opacity-30 blur-[80px] pointer-events-none" />
-        
-        <section className="w-full max-w-[500px] flex flex-col items-center text-center gap-lg px-xl py-2xl z-10 bg-surface-container-lowest/80 backdrop-blur-md rounded-[28px] border border-outline-variant shadow-[0_20px_25px_-5px_rgba(15,23,42,0.1)]">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-sm">
-            <Typography as="span" className="material-symbols-outlined select-none" style={{ fontVariationSettings: "'FILL' 1", fontSize: '36px' }}>
-              verified_user
-            </Typography>
-          </div>
-
-          <div className="flex flex-col gap-sm items-center w-full">
-            <Badge variant="outline" className="w-fit border-primary/20 bg-primary/5 text-primary px-3 py-1 rounded-full">
+      <div className="flex min-h-svh items-center justify-center bg-background px-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col items-center gap-6 p-8">
+            <div className="flex size-16 items-center justify-center rounded-2xl bg-primary/10">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+              </svg>
+            </div>
+            <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary">
               Авторизований
             </Badge>
-            <Typography variant="h2" className="text-on-surface mt-sm">
-              Сесія активна
-            </Typography>
-            <Typography variant="body" tone="muted" className="mt-xs w-full break-words">
-              Ви увійшли як{' '}
-              <Typography as="strong" variant="emphasis" tone="default" className="text-primary break-all" style={{ fontWeight: 600 }}>
-                {auth.user.email}
+            <div className="text-center space-y-2">
+              <Typography variant="h2">Сесія активна</Typography>
+              <Typography tone="muted">
+                Ви увійшли як{' '}
+                <Typography as="strong" variant="emphasis" className="text-primary">
+                  {auth.user.email}
+                </Typography>
               </Typography>
-              .<br />Ласкаво просимо до HR Recruiter.
-            </Typography>
-          </div>
-
-          <Button asChild size="lg" className="w-full sm:w-auto px-xl py-md bg-primary text-on-primary hover:bg-on-primary-fixed-variant transition-all duration-300 rounded-xl shadow-md cursor-pointer mt-md">
-            <Link to="/app">Відкрити дашборд</Link>
-          </Button>
-        </section>
+            </div>
+            <Button asChild size="lg" className="w-full">
+              <Link to="/app">Відкрити дашборд</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen w-full bg-surface text-on-surface antialiased flex items-center justify-center relative overflow-x-hidden p-md lg:p-xl">
-      {/* Decorative background elements */}
-      <div className="fixed top-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-primary-fixed opacity-30 blur-[100px] pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-secondary-fixed opacity-30 blur-[80px] pointer-events-none" />
+    <div className="min-h-svh bg-background">
+      <div className="mx-auto flex min-h-svh max-w-7xl flex-col lg:flex-row lg:items-center lg:gap-16 px-4 py-12 lg:px-8 lg:py-16">
+        {/* Left Column */}
+        <div className="flex-1 space-y-8">
+          <Badge variant="outline" className="w-fit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+            </svg>
+            HR Recruiter
+          </Badge>
 
-      <main className="w-full max-w-[1280px] grid grid-cols-1 lg:grid-cols-12 gap-xl lg:gap-[64px] items-center relative z-10">
-        {/* Left Column (60% on desktop) */}
-        <div className="lg:col-span-7 flex flex-col items-start">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-sm px-md py-sm bg-primary-container text-on-primary-container rounded-full mb-lg shadow-sm">
-            <Typography
-              as="span"
-              className="material-symbols-outlined hero-badge-icon select-none"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              colors_spark
+          <div className="space-y-4">
+            <Typography variant="h1" className="text-4xl font-bold tracking-tight lg:text-5xl">
+              Розумний рекрутинг з{' '}
+              <span className="text-primary">AI-асистентом</span>
             </Typography>
-            <Typography
-              as="span"
-              variant="label"
-              className="uppercase hero-badge-text"
-            >
-              HR Recruiter
+            <Typography className="max-w-xl text-lg text-muted-foreground">
+              Автоматизація підбору персоналу: пошук вакансій та резюме, AI-матчинг, інтеграція з Google Calendar, Sheets та Gmail, щоденні зведення.
             </Typography>
           </div>
 
-          {/* Headline */}
-          <Typography
-            as="h1"
-            className="hero-title text-on-surface mb-md"
-          >
-            Розумний рекрутинг з{' '}
-            <Typography as="span" className="text-primary hero-title">
-              AI-асистентом
-            </Typography>
-          </Typography>
+          <Button asChild size="lg">
+            <Link to="/app">Почати роботу</Link>
+          </Button>
 
-          {/* Description */}
-          <Typography
-            as="p"
-            className="text-on-surface-variant max-w-[600px] mb-xl hero-desc"
-          >
-            Оптимізуйте процес найму, знаходьте найкращих кандидатів швидше та приймайте рішення на основі даних за допомогою нашої передової платформи.
-          </Typography>
-
-          {/* CTA */}
-          <Typography
-            asChild
-            variant="h4"
-          >
-            <button
-              onClick={() => {
-                const element = document.getElementById('auth-form-container')
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' })
-                  const input = element.querySelector('input')
-                  if (input) input.focus()
-                }
-              }}
-              className="inline-block bg-primary text-on-primary px-[32px] py-[16px] rounded-lg shadow-[0_4px_6px_-1px_rgba(15,23,42,0.1)] hover:bg-on-primary-fixed-variant hover:shadow-[0_10px_15px_-3px_rgba(15,23,42,0.1)] hover:-translate-y-0.5 transition-all duration-300 mb-[48px] cursor-pointer"
-            >
-              Почати роботу
-            </button>
-          </Typography>
-
-          {/* Feature Grid (Bento style) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-md w-full max-w-[600px]">
-            {/* Feature 1 */}
-            <div className="group bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-[0_1px_2px_0_rgba(15,23,42,0.05)] hover:shadow-[0_4px_6px_-1px_rgba(15,23,42,0.1)] hover:border-primary transition-all duration-300">
-              <div className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary mb-md group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                <Typography as="span" className="material-symbols-outlined select-none">
-                  neurology
-                </Typography>
+          {/* Feature Grid */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {features.map((feature) => (
+              <div
+                key={feature.title}
+                className="group rounded-xl border bg-card p-5 shadow-sm transition-all hover:shadow-md hover:border-primary/50"
+              >
+                <div className={`mb-3 flex size-10 items-center justify-center rounded-lg ${feature.bg} ${feature.color} ${feature.hoverBg} transition-colors`}>
+                  {feature.icon}
+                </div>
+                <Typography variant="h4" className="mb-1">{feature.title}</Typography>
+                <Typography variant="bodySm" tone="muted">{feature.description}</Typography>
               </div>
-              <Typography as="h3" variant="h4" className="text-on-surface mb-xs">
-                AI-матчинг
-              </Typography>
-              <Typography as="p" variant="bodySm" className="text-on-surface-variant">
-                Точний підбір кандидатів на основі навичок та досвіду.
-              </Typography>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="group bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-[0_1px_2px_0_rgba(15,23,42,0.05)] hover:shadow-[0_4px_6px_-1px_rgba(15,23,42,0.1)] hover:border-primary transition-all duration-300">
-              <div className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-secondary mb-md group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
-                <Typography as="span" className="material-symbols-outlined select-none">
-                  search
-                </Typography>
-              </div>
-              <Typography as="h3" variant="h4" className="text-on-surface mb-xs">
-                Пошук резюме
-              </Typography>
-              <Typography as="p" variant="bodySm" className="text-on-surface-variant">
-                Інтелектуальний семантичний пошук по базі даних.
-              </Typography>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="group bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-[0_1px_2px_0_rgba(15,23,42,0.05)] hover:shadow-[0_4px_6px_-1px_rgba(15,23,42,0.1)] hover:border-primary transition-all duration-300">
-              <div className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-tertiary mb-md group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors">
-                <Typography as="span" className="material-symbols-outlined select-none">
-                  bar_chart
-                </Typography>
-              </div>
-              <Typography as="h3" variant="h4" className="text-on-surface mb-xs">
-                Аналітика
-              </Typography>
-              <Typography as="p" variant="bodySm" className="text-on-surface-variant">
-                Детальні звіти по воронці найму та ефективності.
-              </Typography>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="group bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-[0_1px_2px_0_rgba(15,23,42,0.05)] hover:shadow-[0_4px_6px_-1px_rgba(15,23,42,0.1)] hover:border-primary transition-all duration-300">
-              <div className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface mb-md group-hover:bg-on-surface group-hover:text-surface-container-lowest transition-colors">
-                <Typography as="span" className="material-symbols-outlined select-none">
-                  calendar_today
-                </Typography>
-              </div>
-              <Typography as="h3" variant="h4" className="text-on-surface mb-xs">
-                Google інтеграції
-              </Typography>
-              <Typography as="p" variant="bodySm" className="text-on-surface-variant">
-                Синхронізація подій та зустрічей у реальному часі.
-              </Typography>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Right Column (40% on desktop) */}
-        <div id="auth-form-container" className="lg:col-span-5 w-full max-w-[480px] mx-auto lg:mx-0">
+        {/* Right Column — Auth Form */}
+        <div className="mt-12 w-full max-w-md lg:mt-0 lg:shrink-0">
           <AuthForm />
         </div>
-      </main>
+      </div>
     </div>
   )
 }

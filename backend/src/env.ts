@@ -51,6 +51,8 @@ const envSchema = z.object({
   SMTP_PASS: optionalStringSchema,
   // AI
   OPENAI_API_KEY: optionalStringSchema,
+  FREELLMAPI_URL: optionalUrlSchema,
+  FREELLMAPI_KEY: optionalStringSchema,
   // Telegram
   TELEGRAM_BOT_TOKEN: optionalStringSchema,
   TELEGRAM_CHAT_ID: optionalStringSchema,

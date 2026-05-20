@@ -12,6 +12,10 @@ import { cn } from '@/lib/utils'
 import { ApiRequestError } from '@/lib/api'
 import { useAuth } from '@/lib/use-auth'
 import { Typography } from '@/components/ui/typography'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 type AuthMode = 'login' | 'register'
 type FieldName = 'displayName' | 'email' | 'password'
@@ -38,49 +42,53 @@ export function AuthForm() {
   }
 
   return (
-    <div className="bg-surface-container-lowest/80 backdrop-blur-md rounded-[24px] border border-outline-variant shadow-[0_20px_25px_-5px_rgba(15,23,42,0.1)] overflow-hidden w-full">
-      {/* Tabs */}
-      <div className="flex border-b border-outline-variant">
-        <Typography
-          as="button"
-          id="tab-login"
-          type="button"
-          variant="h4"
-          className={cn(
-            "flex-1 py-lg transition-colors cursor-pointer",
-            mode === 'login'
-              ? "text-primary border-b-2 border-primary bg-surface-container-lowest"
-              : "text-on-surface-variant border-b-2 border-transparent hover:text-primary bg-surface-container-low/50"
-          )}
-          onClick={() => setMode('login')}
-        >
-          Увійти
-        </Typography>
-        <Typography
-          as="button"
-          id="tab-register"
-          type="button"
-          variant="h4"
-          className={cn(
-            "flex-1 py-lg transition-colors cursor-pointer",
-            mode === 'register'
-              ? "text-primary border-b-2 border-primary bg-surface-container-lowest"
-              : "text-on-surface-variant border-b-2 border-transparent hover:text-primary bg-surface-container-low/50"
-          )}
-          onClick={() => setMode('register')}
-        >
-          Реєстрація
-        </Typography>
-      </div>
+    <Card className="w-full">
+      <CardHeader className="space-y-1 pb-4">
+        <CardTitle className="text-2xl font-bold tracking-tight">
+          {mode === 'login' ? 'Увійти' : 'Реєстрація'}
+        </CardTitle>
+        <CardDescription>
+          {mode === 'login'
+            ? 'Введіть email та пароль для входу'
+            : 'Створіть акаунт для початку роботи'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Mode Tabs */}
+        <div className="flex rounded-lg bg-muted p-1">
+          <button
+            type="button"
+            onClick={() => setMode('login')}
+            className={cn(
+              'flex-1 rounded-md px-4 py-2 text-sm font-medium transition-all',
+              mode === 'login'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            Увійти
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('register')}
+            className={cn(
+              'flex-1 rounded-md px-4 py-2 text-sm font-medium transition-all',
+              mode === 'register'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            Реєстрація
+          </button>
+        </div>
 
-      <div className="p-xl">
         {mode === 'login' ? (
           <LoginForm draft={draft} onDraftChange={updateDraft} />
         ) : (
           <RegisterForm draft={draft} onDraftChange={updateDraft} />
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -127,7 +135,7 @@ function RegisterForm({
   return (
     <form
       id="form-register"
-      className="flex flex-col gap-lg"
+      className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault()
         void form.handleSubmit()
@@ -136,47 +144,22 @@ function RegisterForm({
       <form.Field
         name="displayName"
         children={(field) => (
-          <div className="flex flex-col gap-xs">
-            <Typography
-              as="label"
-              htmlFor={displayNameId}
-              variant="label"
-              className="text-on-surface"
-            >
-              Ім'я
-            </Typography>
-            <div className="relative">
-              <Typography
-                as="span"
-                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
-              >
-                person
-              </Typography>
-              <input
-                id={displayNameId}
-                name={field.name}
-                value={field.state.value ?? ''}
-                type="text"
-                autoComplete="name"
-                placeholder="Ваше ім'я"
-                className="w-full pl-[48px] pr-md py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                onBlur={field.handleBlur}
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.handleChange(value)
-                  onDraftChange({ displayName: value })
-                  clearFieldError('displayName', setFieldErrors)
-                  setFormError(null)
-                }}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor={displayNameId}>Ім'я</Label>
+            <Input
+              id={displayNameId}
+              value={field.state.value ?? ''}
+              placeholder="Ваше ім'я"
+              onBlur={field.handleBlur}
+              onChange={(e) => {
+                field.handleChange(e.target.value)
+                onDraftChange({ displayName: e.target.value })
+                clearFieldError('displayName', setFieldErrors)
+                setFormError(null)
+              }}
+            />
             {hasErrors(fieldErrors.displayName) && (
-              <Typography
-                as="span"
-                variant="caption"
-                tone="destructive"
-                className="mt-xs block"
-              >
+              <Typography variant="caption" tone="destructive">
                 {fieldErrors.displayName?.[0]?.message}
               </Typography>
             )}
@@ -187,46 +170,23 @@ function RegisterForm({
       <form.Field
         name="email"
         children={(field) => (
-          <div className="flex flex-col gap-xs">
-            <Typography
-              as="label"
-              htmlFor={emailId}
-              variant="label"
-              className="text-on-surface"
-            >
-              Email
-            </Typography>
-            <div className="relative">
-              <Typography
-                as="span"
-                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
-              >
-                mail
-              </Typography>
-              <input
-                id={emailId}
-                name={field.name}
-                value={field.state.value}
-                type="email"
-                placeholder="name@company.com"
-                className="w-full pl-[48px] pr-md py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                onBlur={field.handleBlur}
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.handleChange(value)
-                  onDraftChange({ email: value })
-                  clearFieldError('email', setFieldErrors)
-                  setFormError(null)
-                }}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor={emailId}>Email</Label>
+            <Input
+              id={emailId}
+              type="email"
+              value={field.state.value}
+              placeholder="name@company.com"
+              onBlur={field.handleBlur}
+              onChange={(e) => {
+                field.handleChange(e.target.value)
+                onDraftChange({ email: e.target.value })
+                clearFieldError('email', setFieldErrors)
+                setFormError(null)
+              }}
+            />
             {hasErrors(fieldErrors.email) && (
-              <Typography
-                as="span"
-                variant="caption"
-                tone="destructive"
-                className="mt-xs block"
-              >
+              <Typography variant="caption" tone="destructive">
                 {fieldErrors.email?.[0]?.message}
               </Typography>
             )}
@@ -237,60 +197,37 @@ function RegisterForm({
       <form.Field
         name="password"
         children={(field) => (
-          <div className="flex flex-col gap-xs">
-            <Typography
-              as="label"
-              htmlFor={passwordId}
-              variant="label"
-              className="text-on-surface"
-            >
-              Пароль
-            </Typography>
+          <div className="space-y-2">
+            <Label htmlFor={passwordId}>Пароль</Label>
             <div className="relative">
-              <Typography
-                as="span"
-                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
-              >
-                lock
-              </Typography>
-              <input
+              <Input
                 id={passwordId}
-                name={field.name}
-                value={field.state.value}
                 type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
+                value={field.state.value}
                 placeholder="Створіть пароль"
-                className="w-full pl-[48px] pr-[48px] py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                className="pr-10"
                 onBlur={field.handleBlur}
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.handleChange(value)
-                  onDraftChange({ password: value })
+                onChange={(e) => {
+                  field.handleChange(e.target.value)
+                  onDraftChange({ password: e.target.value })
                   clearFieldError('password', setFieldErrors)
                   setFormError(null)
                 }}
               />
-              <Typography
-                as="button"
+              <button
                 type="button"
-                className="absolute right-md top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                <Typography
-                  as="span"
-                  className="material-symbols-outlined select-none"
-                >
-                  {showPassword ? 'visibility_off' : 'visibility'}
-                </Typography>
-              </Typography>
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                )}
+              </button>
             </div>
             {hasErrors(fieldErrors.password) && (
-              <Typography
-                as="span"
-                variant="caption"
-                tone="destructive"
-                className="mt-xs block"
-              >
+              <Typography variant="caption" tone="destructive">
                 {fieldErrors.password?.[0]?.message}
               </Typography>
             )}
@@ -303,33 +240,11 @@ function RegisterForm({
       <form.Subscribe
         selector={(state) => state.isSubmitting}
         children={(isSubmitting) => (
-          <Typography
-            as="button"
-            type="submit"
-            disabled={isSubmitting}
-            variant="h4"
-            className="w-full bg-secondary text-on-secondary py-[14px] rounded-lg shadow-sm hover:bg-on-secondary-fixed-variant transition-colors mt-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? 'Створення...' : 'Зареєструватися'}
-          </Typography>
+          </Button>
         )}
       />
-
-      <Typography
-        as="p"
-        variant="caption"
-        className="text-center text-on-surface-variant mt-sm"
-      >
-        Натискаючи кнопку, ви погоджуєтесь з{' '}
-        <Typography
-          as="a"
-          variant="caption"
-          className="text-primary hover:underline"
-          href="#"
-        >
-          Умовами використання
-        </Typography>
-      </Typography>
     </form>
   )
 }
@@ -379,7 +294,7 @@ function LoginForm({
   return (
     <form
       id="form-login"
-      className="flex flex-col gap-lg"
+      className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault()
         void form.handleSubmit()
@@ -388,46 +303,23 @@ function LoginForm({
       <form.Field
         name="email"
         children={(field) => (
-          <div className="flex flex-col gap-xs">
-            <Typography
-              as="label"
-              htmlFor={emailId}
-              variant="label"
-              className="text-on-surface"
-            >
-              Email
-            </Typography>
-            <div className="relative">
-              <Typography
-                as="span"
-                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
-              >
-                mail
-              </Typography>
-              <input
-                id={emailId}
-                name={field.name}
-                value={field.state.value}
-                type="email"
-                placeholder="name@company.com"
-                className="w-full pl-[48px] pr-md py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                onBlur={field.handleBlur}
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.handleChange(value)
-                  onDraftChange({ email: value })
-                  clearFieldError('email', setFieldErrors)
-                  setFormError(null)
-                }}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor={emailId}>Email</Label>
+            <Input
+              id={emailId}
+              type="email"
+              value={field.state.value}
+              placeholder="name@company.com"
+              onBlur={field.handleBlur}
+              onChange={(e) => {
+                field.handleChange(e.target.value)
+                onDraftChange({ email: e.target.value })
+                clearFieldError('email', setFieldErrors)
+                setFormError(null)
+              }}
+            />
             {hasErrors(fieldErrors.email) && (
-              <Typography
-                as="span"
-                variant="caption"
-                tone="destructive"
-                className="mt-xs block"
-              >
+              <Typography variant="caption" tone="destructive">
                 {fieldErrors.email?.[0]?.message}
               </Typography>
             )}
@@ -438,60 +330,42 @@ function LoginForm({
       <form.Field
         name="password"
         children={(field) => (
-          <div className="flex flex-col gap-xs">
-            <Typography
-              as="label"
-              htmlFor={passwordId}
-              variant="label"
-              className="text-on-surface"
-            >
-              Пароль
-            </Typography>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor={passwordId}>Пароль</Label>
+              <button type="button" className="text-sm text-primary hover:underline">
+                Забули пароль?
+              </button>
+            </div>
             <div className="relative">
-              <Typography
-                as="span"
-                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
-              >
-                lock
-              </Typography>
-              <input
+              <Input
                 id={passwordId}
-                name={field.name}
-                value={field.state.value}
                 type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
+                value={field.state.value}
                 placeholder="••••••••"
-                className="w-full pl-[48px] pr-[48px] py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                className="pr-10"
                 onBlur={field.handleBlur}
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.handleChange(value)
-                  onDraftChange({ password: value })
+                onChange={(e) => {
+                  field.handleChange(e.target.value)
+                  onDraftChange({ password: e.target.value })
                   clearFieldError('password', setFieldErrors)
                   setFormError(null)
                 }}
               />
-              <Typography
-                as="button"
+              <button
                 type="button"
-                className="absolute right-md top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                <Typography
-                  as="span"
-                  className="material-symbols-outlined select-none"
-                >
-                  {showPassword ? 'visibility_off' : 'visibility'}
-                </Typography>
-              </Typography>
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                )}
+              </button>
             </div>
             {hasErrors(fieldErrors.password) && (
-              <Typography
-                as="span"
-                variant="caption"
-                tone="destructive"
-                className="mt-xs block"
-              >
+              <Typography variant="caption" tone="destructive">
                 {fieldErrors.password?.[0]?.message}
               </Typography>
             )}
@@ -499,42 +373,14 @@ function LoginForm({
         )}
       />
 
-      <div className="flex items-center justify-between mt-sm mb-sm">
-        <Typography
-          as="label"
-          variant="bodySm"
-          className="flex items-center gap-sm cursor-pointer group select-none text-on-surface-variant hover:text-on-surface transition-colors"
-        >
-          <input
-            type="checkbox"
-            className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary bg-surface transition-colors cursor-pointer"
-          />
-          Запам'ятати мене
-        </Typography>
-        <Typography
-          as="a"
-          variant="label"
-          className="text-primary hover:text-on-primary-fixed-variant transition-colors"
-          href="#"
-        >
-          Забули пароль?
-        </Typography>
-      </div>
-
       <FormAlert message={formError} />
 
       <form.Subscribe
         selector={(state) => state.isSubmitting}
         children={(isSubmitting) => (
-          <Typography
-            as="button"
-            type="submit"
-            disabled={isSubmitting}
-            variant="h4"
-            className="w-full bg-primary text-on-primary py-[14px] rounded-lg shadow-sm hover:bg-on-primary-fixed-variant transition-colors cursor-pointer disabled:opacity-50"
-          >
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? 'Вхід...' : 'Увійти'}
-          </Typography>
+          </Button>
         )}
       />
     </form>
@@ -545,26 +391,22 @@ function FormAlert({ message }: { message: string | null }) {
   if (!message) return null
 
   return (
-    <div className="bg-error-container text-on-error-container p-md rounded-lg border border-error/20 flex flex-col gap-xs">
-      <Typography
-        as="span"
-        variant="label"
-        className="uppercase text-error flex items-center gap-xs"
-      >
-        <Typography
-          as="span"
-          className="material-symbols-outlined"
-        >
-          error
-        </Typography>
-        Помилка авторизації
-      </Typography>
-      <Typography
-        as="p"
-        variant="bodySm"
-      >
-        {message}
-      </Typography>
+    <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+      <div className="flex gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-destructive mt-0.5 shrink-0">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" x2="12" y1="8" y2="12" />
+          <line x1="12" x2="12.01" y1="16" y2="16" />
+        </svg>
+        <div>
+          <Typography variant="bodySm" className="font-medium text-destructive">
+            Помилка авторизації
+          </Typography>
+          <Typography variant="bodySm" tone="muted" className="mt-1">
+            {message}
+          </Typography>
+        </div>
+      </div>
     </div>
   )
 }
