@@ -1,38 +1,38 @@
-# Детальний опис архітектури, схем бази даних та завдань
+# Detailed Architecture, Database Schemas, and Tasks
 
-Цей документ надає вичерпну технічну специфікацію системи **HR Recruiter**: структуру каталогів, архітектурні рішення, опис схем баз даних, а також перелік виконаних та майбутніх завдань.
+This document provides a comprehensive technical specification of the **HR Recruiter** system, including directory structure, architectural designs, database schema descriptions, and the list of completed and future tasks.
 
 ---
 
-## 1. Структура документації та проектних каталогів
+## 1. Documentation and Project Catalog Structure
 
-Проект організований як монорепозиторій на базі **Bun Workspaces** та містить такі ключові модулі:
+The project is organized as a monorepo powered by **Bun Workspaces** and contains the following key modules:
 
 ```text
 hr/
-├── docs/                     # Системна документація (Архітектура, БД, Тестування)
-├── backend/                  # REST API сервер на базі Hono та Prisma ORM
-│   ├── prisma/               # Схема бази даних та файли міграцій
-│   │   ├── migrations/       # SQL міграції Prisma (включаючи 20260520000000_init)
-│   │   └── schema.prisma     # Декларативна схема моделей Prisma
-│   └── src/                  # Вихідний код бекенду (auth, hr, integrations, storage)
-├── web/                      # React SPA веб-клієнт на базі Vite та TanStack
+├── docs/                     # System documentation (Architecture, Database, Testing)
+├── backend/                  # REST API server built with Hono and Prisma ORM
+│   ├── prisma/               # Database schema and migrations
+│   │   ├── migrations/       # Prisma SQL migrations (including 20260520000000_init)
+│   │   └── schema.prisma     # Declarative Prisma model schema
+│   └── src/                  # Backend source code (auth, hr, integrations, storage)
+├── web/                      # React SPA web client built with Vite and TanStack
 │   ├── src/
-│   │   ├── components/       # Спільні UI компоненти (включаючи ErrorBoundary)
-│   │   ├── lib/              # Клієнти API, контекст авторизації (auth, hr-api)
-│   │   ├── pages/            # Сторінки (Dashboard, Vacancies, Resumes, Analytics)
-│   │   └── routes.tsx        # Роутинг TanStack Router із Route Guards
-├── landing/                  # Статичний промо-сайт (landing page) на Astro
-├── mobile/                   # Мобільний додаток на базі Expo та React Native
+│   │   ├── components/       # Shared UI components (including ErrorBoundary)
+│   │   ├── lib/              # API clients, authentication context (auth, hr-api)
+│   │   ├── pages/            # Page views (Dashboard, Vacancies, Resumes, Analytics)
+│   │   └── routes.tsx        # TanStack Router configuration with Route Guards
+├── landing/                  # Static landing page built with Astro
+├── mobile/                   # Mobile application built with Expo and React Native
 └── packages/
-    └── contracts/            # Спільні Zod-схеми валідації та DTO між клієнтами і сервером
+    └── contracts/            # Shared Zod schemas and DTOs between client and server
 ```
 
 ---
 
-## 2. Архітектура системи
+## 2. System Architecture
 
-Архітектурний дизайн проекту слідує принципу **Modular Monolith** із чітким розділенням обов'язків.
+The project's architectural design follows the **Modular Monolith** pattern with a clear separation of concerns.
 
 ```mermaid
 graph TD
@@ -68,150 +68,150 @@ graph TD
     Service --> AI
 ```
 
-### 2.1. Авторизація та безпека (Auth Flow)
-* **JWT сесії**: Короткоживучі Access Token зберігаються виключно в пам'яті клієнта (RAM) для запобігання XSS-атакам.
-* **HttpOnly Cookies**: Довгоживучі Refresh Token зберігаються в захищених HttpOnly, SameSite куках.
-* **Ротація Refresh-токенів**: При кожному оновленні Access Token бекенд виконує атомарну ротацію токенів у базі даних (видає нову пару, а стару маркує як відкликану) для захисту від повторного використання.
-* **Хешування паролів**: Використовується алгоритм Argon2id через вбудований `Bun.password.hash`.
+### 2.1. Authentication and Security (Auth Flow)
+* **JWT Sessions**: Short-lived Access Tokens are stored exclusively in the client's memory (RAM) to prevent XSS attacks.
+* **HttpOnly Cookies**: Long-lived Refresh Tokens are stored in secure, HttpOnly, SameSite cookies.
+* **Refresh Token Rotation**: Upon each Access Token refresh, the backend performs atomic token rotation in the database (issues a new pair and revokes the old one) to protect against replay attacks.
+* **Password Hashing**: Uses the Argon2id algorithm via Bun's built-in `Bun.password.hash`.
 
-### 2.2. Пошуковий шар (Scrapers Integration)
-* Уніфікована служба пошуку вакансій та кандидатів інтегрована з основними платформами:
+### 2.2. Search Layer (Scrapers Integration)
+* A unified job and candidate search service integrates with major boards:
   * **LinkedIn Scraper**
   * **Work.ua Scraper**
   * **Robota.ua Scraper**
-* Всі парсери повертають результати через загальний інтерфейс, що дозволяє паралельно виконувати запити за допомогою `Promise.all`.
+* All scrapers return results through a common interface, allowing requests to be executed concurrently using `Promise.all`.
 
-### 2.3. AI-Аналіз та Матчинг кандидатів (AI Service)
-* Бекенд містить сервіс `AIService` інтегрований із LLM (через OpenAI/Anthropic SDK).
-* Сервіс аналізує опис вакансії та резюме кандидата, розраховує **Match Score** (від 0 до 100) та генерує детальний звіт:
-  * *Сильні сторони кандидата* (Pros).
-  * *Слабкі сторони / прогалини у кваліфікації* (Cons).
-  * *Рекомендації для інтерв'юера*.
+### 2.3. AI-Analysis and Match Scoring (AI Service)
+* The backend contains an `AIService` integrated with LLMs (via OpenAI/Anthropic SDKs).
+* The service analyzes job vacancy descriptions and candidate resumes, calculates a **Match Score** (from 0 to 100), and generates a detailed report outlining:
+  * *Candidate strengths* (Pros).
+  * *Qualification gaps / weaknesses* (Cons).
+  * *Recommended questions for the interviewer*.
 
 ---
 
-## 3. Схема Бази Даних (Database Schema)
+## 3. Database Schema
 
-Система використовує **PostgreSQL** та **Prisma ORM**. Первинні ключі генеруються базою даних за допомогою функції `UUIDv7` (потребує PostgreSQL 18+).
+The system uses **PostgreSQL** and **Prisma ORM**. Primary keys are database-generated using `UUIDv7` (requires PostgreSQL 18+).
 
- Моделі представлені такими таблицями:
+The models are represented by the following tables:
 
-### 3.1. Таблиця `users`
-Зберігає користувачів системи (рекрутерів).
-* `id` (`UUID`, PK, за замовчуванням `gen_random_uuid()` / `uuidv7`)
-* `email` (`TEXT`, Unique, Index) — електронна пошта.
-* `password_hash` (`TEXT`) — хеш пароля Argon2id.
-* `display_name` (`TEXT`, Optional) — ім'я користувача.
+### 3.1. `users` Table
+Stores system users (recruiters).
+* `id` (`UUID`, PK, defaults to `gen_random_uuid()` / `uuidv7`)
+* `email` (`TEXT`, Unique, Index) — user email address.
+* `password_hash` (`TEXT`) — Argon2id password hash.
+* `display_name` (`TEXT`, Optional) — display name of the user.
 * `created_at` / `updated_at` (`TIMESTAMP`)
 
-### 3.2. Таблиця `auth_sessions`
-Сесії авторизації та Refresh-токени.
+### 3.2. `auth_sessions` Table
+Stores active authentication sessions and Refresh Token hashes.
 * `id` (`UUID`, PK)
-* `user_id` (`UUID`, FK -> `users.id` ON DELETE CASCADE) — рекрутер, якому належить сесія.
-* `refresh_token_hash` (`TEXT`, Unique) — SHA-256 хеш токена оновлення.
-* `expires_at` (`TIMESTAMP`, Index) — дата закінчення сесії.
-* `revoked_at` (`TIMESTAMP`, Optional) — дата відкликання сесії (якщо відкликано).
+* `user_id` (`UUID`, FK -> `users.id` ON DELETE CASCADE) — owner of the session.
+* `refresh_token_hash` (`TEXT`, Unique) — SHA-256 hash of the refresh token.
+* `expires_at` (`TIMESTAMP`, Index) — expiration date/time.
+* `revoked_at` (`TIMESTAMP`, Optional) — revocation date/time (if applicable).
 * `user_agent` / `ip_address` (`TEXT`, Optional)
 * `created_at` / `updated_at` (`TIMESTAMP`)
 
-### 3.3. Таблиця `vacancies`
-Опубліковані або знайдені вакансії.
+### 3.3. `vacancies` Table
+Stores manually created or imported job vacancies.
 * `id` (`UUID`, PK)
-* `user_id` (`UUID`, FK -> `users.id` ON DELETE CASCADE) — власник вакансії.
-* `title` (`TEXT`) — назва вакансії.
-* `company` (`TEXT`) — назва компанії.
-* `location` (`TEXT`, Optional) — локація.
-* `salary_from` / `salary_to` (`INTEGER`, Optional) — вилка зарплати.
-* `currency` (`TEXT`, default `'RUB'`) — валюта.
-* `description` (`TEXT`) — опис вакансії.
-* `source` (`TEXT`) — джерело (напр. `manual`, `work.ua`, `linkedin`).
-* `source_url` (`TEXT`, Optional) — посилання на першоджерело.
-* `status` (`TEXT`, default `'active'`) — статус (`active`, `closed`).
+* `user_id` (`UUID`, FK -> `users.id` ON DELETE CASCADE) — owner of the vacancy.
+* `title` (`TEXT`) — vacancy title.
+* `company` (`TEXT`) — company name.
+* `location` (`TEXT`, Optional) — location.
+* `salary_from` / `salary_to` (`INTEGER`, Optional) — salary range boundaries.
+* `currency` (`TEXT`, default `'RUB'`) — currency type.
+* `description` (`TEXT`) — vacancy description.
+* `source` (`TEXT`) — source platform (e.g. `manual`, `work.ua`, `linkedin`).
+* `source_url` (`TEXT`, Optional) — URL to the original posting.
+* `status` (`TEXT`, default `'active'`) — vacancy status (`active`, `closed`).
 * `created_at` / `updated_at` (`TIMESTAMP`, Index)
 
-### 3.4. Таблиця `resumes`
-Резюме кандидатів.
+### 3.4. `resumes` Table
+Stores candidate resumes.
 * `id` (`UUID`, PK)
-* `user_id` (`UUID`, FK -> `users.id` ON DELETE CASCADE) — власник резюме.
-* `full_name` (`TEXT`) — ім'я та прізвище кандидата.
-* `email` / `phone` (`TEXT`, Optional) — контакти.
-* `position` (`TEXT`) — бажана посада.
-* `salary` (`INTEGER`, Optional) — зарплатні очікування.
+* `user_id` (`UUID`, FK -> `users.id` ON DELETE CASCADE) — owner of the resume.
+* `full_name` (`TEXT`) — candidate's full name.
+* `email` / `phone` (`TEXT`, Optional) — contact details.
+* `position` (`TEXT`) — target job position.
+* `salary` (`INTEGER`, Optional) — salary expectations.
 * `currency` (`TEXT`, default `'RUB'`)
-* `skills` (`TEXT[]`, default `[]`) — масив навичок кандидата.
-* `experience` / `education` (`TEXT`, Optional) — опис досвіду та освіти.
-* `source` (`TEXT`) — джерело.
+* `skills` (`TEXT[]`, default `[]`) — array of candidate skills.
+* `experience` / `education` (`TEXT`, Optional) — background details.
+* `source` (`TEXT`) — source platform.
 * `source_url` (`TEXT`, Optional)
-* `status` (`TEXT`, default `'new'`) — статус (`new`, `interviewing`, `offered`, `rejected`).
+* `status` (`TEXT`, default `'new'`) — resume status (`new`, `interviewing`, `offered`, `rejected`).
 * `created_at` / `updated_at` (`TIMESTAMP`, Index)
 
-### 3.5. Таблиця `matches`
-Зв'язок між вакансіями та кандидатами із оцінкою відповідності.
+### 3.5. `matches` Table
+Tracks relationships between vacancies and resumes with AI-generated compatibility scores.
 * `id` (`UUID`, PK)
 * `vacancy_id` (`UUID`, FK -> `vacancies.id` ON DELETE CASCADE)
 * `resume_id` (`UUID`, FK -> `resumes.id` ON DELETE CASCADE)
-* `score` (`DOUBLE PRECISION`, default `0`) — оцінка сумісності від AI.
-* `status` (`TEXT`, default `'pending'`) — статус розгляду (`pending`, `approved`, `rejected`).
+* `score` (`DOUBLE PRECISION`, default `0`) — AI compatibility score.
+* `status` (`TEXT`, default `'pending'`) — match status (`pending`, `approved`, `rejected`).
 * `created_at` (`TIMESTAMP`)
-* **Унікальний індекс**: `(vacancy_id, resume_id)` — запобігає дублюванню зв'язку між однією вакансією та одним резюме.
+* **Unique Index**: `(vacancy_id, resume_id)` — prevents duplicate match links.
 
-### 3.6. Таблиця `tasks`
-Справи та завдання рекрутера (календар).
+### 3.6. `tasks` Table
+Recruiter tasks and scheduled calendar events.
 * `id` (`UUID`, PK)
 * `user_id` (`UUID`, FK -> `users.id` ON DELETE CASCADE)
-* `title` (`TEXT`) — заголовок події.
+* `title` (`TEXT`) — task title.
 * `description` (`TEXT`, Optional)
-* `event_type` (`TEXT`) — тип події (`interview`, `call`, `follow_up`).
-* `scheduled_at` (`TIMESTAMP`, Index) — запланований час.
-* `status` (`TEXT`, default `'pending'`) — статус події (`pending`, `completed`, `cancelled`).
+* `event_type` (`TEXT`) — event category (`interview`, `call`, `follow_up`).
+* `scheduled_at` (`TIMESTAMP`, Index) — scheduled date and time.
+* `status` (`TEXT`, default `'pending'`) — event status (`pending`, `completed`, `cancelled`).
 * `created_at` / `updated_at` (`TIMESTAMP`)
 
-### 3.7. Таблиця `email_logs`
-Логи надісланих електронних листів.
+### 3.7. `email_logs` Table
+Logs sent emails for auditing.
 * `id` (`UUID`, PK)
 * `user_id` (`UUID`, FK -> `users.id` ON DELETE CASCADE)
-* `to` (`TEXT`) — адресат.
-* `subject` (`TEXT`) — тема листа.
-* `body` (`TEXT`) — тіло листа.
+* `to` (`TEXT`) — recipient email address.
+* `subject` (`TEXT`) — email subject.
+* `body` (`TEXT`) — email body content.
 * `status` (`TEXT`, default `'sent'`)
 * `created_at` (`TIMESTAMP`, Index)
 
-### 3.8. Таблиця `salary_reports`
-Звіти щодо ринкових зарплат.
+### 3.8. `salary_reports` Table
+Stores queried market salary statistics.
 * `id` (`UUID`, PK)
 * `user_id` (`UUID`, FK -> `users.id` ON DELETE CASCADE)
-* `position` (`TEXT`) — посада для оцінки.
-* `location` (`TEXT`, Optional) — локація оцінки.
-* `avg_salary` / `min_salary` / `max_salary` (`INTEGER`) — показники вилки.
+* `position` (`TEXT`) — position title.
+* `location` (`TEXT`, Optional) — location context.
+* `avg_salary` / `min_salary` / `max_salary` (`INTEGER`) — market values.
 * `currency` (`TEXT`, default `'RUB'`)
-* `source` (`TEXT`) — джерело даних.
+* `source` (`TEXT`) — market data source.
 * `created_at` (`TIMESTAMP`, Index)
 
 ---
 
-## 4. Список виконаних та майбутніх завдань (Tasks & Roadmap)
+## 4. Tasks and Roadmap
 
-### 4.1. Виконано (Done)
-- [x] **Аналітика та Звіти (Ресурси)**:
-  - Розроблено сторінку `AnalyticsPage` з інтерактивними графіками на базі `Recharts` (Funnel, Skills, Salary).
-  - Реалізовано генерацію детальних звітів по кандидатах та аналіз ринкових зарплат.
-  - Налаштовано експорт звітів у Excel (CSV з UTF-8 BOM для правильного відкриття в Excel) та друкований PDF-варіант (через CSS `@media print`).
-- [x] **Віджети Дашборду**:
-  - Інтегровано блоки «Daily Digest» та «Recruiting Activity» на головну сторінку для швидкого перегляду статистики за 7 днів та середнього Match Score.
-- [x] **Усунення критичних зауважень аудиту**:
-  - **Prisma Migrations**: Створено початкову міграцію [20260520000000_init](file:///d:/operator_v2.2-main/hr/backend/prisma/migrations/20260520000000_init/migration.sql).
-  - **Типізація бєкенду**: Замінено `any` на `DbClient` у всіх роутерах модуля `hr`.
-  - **Docker Compose**: Узгоджено назву локальної бази даних (`web_app_demo`).
-  - **Route Guards**: Захищено маршрути `/app/*` від неавторизованого доступу з редиректом на головну.
-  - **ErrorBoundary**: Запобіжний компонент інтегрований у головний лейаут додатку для перехоплення неочікуваних клієнтських винятків.
-  - **Docker Hygiene**: Додано `.dockerignore` для очищення збірок бєкенду від `node_modules` та локальних конфігів.
+### 4.1. Completed (Done)
+- [x] **Analytics and Reporting (Features)**:
+  - Developed `AnalyticsPage` with interactive Recharts charts (Funnel, Skills, Salary).
+  - Implemented candidate reports and market salary analytics.
+  - Implemented report exports: Excel (CSV with UTF-8 BOM for correct cell encoding) and print-ready PDF layouts (via `@media print` rules).
+- [x] **Dashboard Widgets**:
+  - Integrated "Daily Digest" and "Recruiting Activity" widgets into the dashboard view to track 7-day uploads and average Match Scores.
+- [x] **Audit Recommendations Resolution**:
+  - **Prisma Migrations**: Created initial migration [20260520000000_init](file:///d:/operator_v2.2-main/hr/backend/prisma/migrations/20260520000000_init/migration.sql).
+  - **Backend Type-Safety**: Replaced `any` with `DbClient` across all Hono `hr` routers.
+  - **Docker Compose**: Synchronized local database name configuration (`web_app_demo`).
+  - **Route Guards**: Protected `/app/*` routes from unauthenticated navigation with automatic login redirects.
+  - **ErrorBoundary Component**: Added root-level error boundaries to the React layout to intercept exceptions.
+  - **Docker Hygiene**: Configured `.dockerignore` for backend modules.
 
-### 4.2. Заплановано на майбутнє (Roadmap / To Do)
-- [ ] **Email-інтеграція**:
-  - Налаштувати відправку реальних листів через SMTP/AWS SES (зараз створено лише логи надсилань у таблиці `email_logs`).
-- [ ] **OAuth2 Авторизація**:
-  - Додати швидкий вхід за допомогою Google/LinkedIn.
-- [ ] **Мобільний клієнт (Expo)**:
-  - Завершити синхронізацію контрактів для додатка `mobile/` та додати екран аналітики на мобільні телефони.
-- [ ] **Календар завдань**:
-  - Реалізувати інтеграцію завдань рекрутера з Google Calendar через API.
+### 4.2. Planned (To Do / Roadmap)
+- [ ] **Email Service Integration**:
+  - Integrate a real SMTP or AWS SES mail sender (currently only writes to `email_logs`).
+- [ ] **OAuth2 Authentication**:
+  - Add Google and LinkedIn social login.
+- [ ] **Mobile Client (Expo)**:
+  - Synchronize contract definitions for the `mobile/` client and add analytics screen implementations.
+- [ ] **Calendar Task Sync**:
+  - Sync task records with external Google Calendar endpoints.
