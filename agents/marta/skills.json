@@ -1,0 +1,21 @@
+{
+  "agentId": "marta",
+  "skills": [
+    {
+      "name": "boolean_query_generator",
+      "description": "Transforms high-level job descriptions into complex logical search strings for Djinni, LinkedIn, and Google X-ray searches."
+    },
+    {
+      "name": "linkedin_profile_parser",
+      "description": "Scrapes and structures LinkedIn public search results, extracting experience, titles, and certifications."
+    },
+    {
+      "name": "djinni_api_sourcing",
+      "description": "Searches Djinni platform profiles, matching candidate salaries and tech stacks."
+    },
+    {
+      "name": "resume_funnel_filter",
+      "description": "Aggregates raw profiles and applies threshold filters based on years of experience and stack requirements."
+    }
+  ]
+}

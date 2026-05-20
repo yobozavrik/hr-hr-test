@@ -1,0 +1,21 @@
+{
+  "agentId": "sofia",
+  "skills": [
+    {
+      "name": "personalized_copywriting",
+      "description": "Writes highly personalized cold emails and LinkedIn messages using candidates' public profiles."
+    },
+    {
+      "name": "human_in_the_loop_guard",
+      "description": "Ensures that all messages are held for human review and validation before being dispatched."
+    },
+    {
+      "name": "calendar_scheduler_api",
+      "description": "Integrates with Google Calendar/Outlook to suggest, reserve, and schedule recruiter-candidate interview slots."
+    },
+    {
+      "name": "follow_up_engine",
+      "description": "Orchestrates multi-channel follow-up sequences with customizable delays (e.g., 3 days, 7 days)."
+    }
+  ]
+}

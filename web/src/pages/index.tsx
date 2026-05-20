@@ -5,4 +5,6 @@ export { MatchesPage } from './matches'
 export { TasksPage } from './tasks'
 export { SearchPage } from './search'
 export { AnalyticsPage } from './analytics'
+export { AgentsPage } from './agents'
+
 

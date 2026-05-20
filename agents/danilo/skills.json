@@ -1,0 +1,21 @@
+{
+  "agentId": "danilo",
+  "skills": [
+    {
+      "name": "salary_aggregator_api",
+      "description": "Pulls dynamic salary ranges and medians from Djinni, DOU, and Glassdoor API integrations."
+    },
+    {
+      "name": "market_ratio_calculator",
+      "description": "Calculates the ratio of open job postings to active candidates for a given technology/seniority combo."
+    },
+    {
+      "name": "currency_normalizer",
+      "description": "Normalizes various salary expressions (hourly, annual, gross, net, EUR, UAH) to standard monthly USD net."
+    },
+    {
+      "name": "recruitment_difficulty_scorer",
+      "description": "Computes hiring complexity based on talent supply, median salary inflation, and historical time-to-hire metrics."
+    }
+  ]
+}

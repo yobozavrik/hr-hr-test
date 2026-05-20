@@ -189,5 +189,23 @@ export class HrApiClient {
   aiTrackCompetitors(data: { company: string; niche: string }) {
     return this.request('/api/hr/ai/competitors', { method: 'POST', body: data })
   }
+
+  // Agent Dashboard API
+  getAgentStats() {
+    return this.request('/api/hr/agents/stats')
+  }
+
+  getAgentTasks(agentId?: string) {
+    const url = agentId ? `/api/hr/agents/tasks?agentId=${agentId}` : '/api/hr/agents/tasks'
+    return this.request(url)
+  }
+
+  createAgentTask(data: { agentId: string; taskTitle: string; inputParams?: string }) {
+    return this.request('/api/hr/agents/tasks', { method: 'POST', body: data })
+  }
+
+  updateAgentTask(agentId: string, taskId: string, data: { status: string; outputResult?: string; durationMs?: number }) {
+    return this.request(`/api/hr/agents/tasks/${agentId}/${taskId}`, { method: 'PATCH', body: data })
+  }
 }
 

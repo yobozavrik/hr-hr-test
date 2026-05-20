@@ -22,6 +22,12 @@ model User {
   tasks         Task[]
   emailLogs     EmailLog[]
   salaryReports SalaryReport[]
+  martaLogs     MartaTaskLog[]
+  arturLogs     ArturTaskLog[]
+  sofiaLogs     SofiaTaskLog[]
+  daniloLogs    DaniloTaskLog[]
+  maksymLogs    MaksymTaskLog[]
+  olenaLogs     OlenaTaskLog[]
 
   @@map("users")
 }
@@ -159,4 +165,106 @@ model SalaryReport {
 
   @@index([userId], map: "salary_reports_user_id_idx")
   @@map("salary_reports")
+}
+
+// Marta Task Log
+model MartaTaskLog {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String    @db.Uuid @map("user_id")
+  taskTitle    String    @map("task_title")
+  status       String    @default("pending") // pending, running, completed, failed, paused
+  inputParams  String?   @map("input_params") @db.Text
+  outputResult String?   @map("output_result") @db.Text
+  durationMs   Int?      @map("duration_ms")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "marta_task_logs_user_id_idx")
+  @@map("marta_task_logs")
+}
+
+// Artur Task Log
+model ArturTaskLog {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String    @db.Uuid @map("user_id")
+  taskTitle    String    @map("task_title")
+  status       String    @default("pending")
+  inputParams  String?   @map("input_params") @db.Text
+  outputResult String?   @map("output_result") @db.Text
+  durationMs   Int?      @map("duration_ms")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "artur_task_logs_user_id_idx")
+  @@map("artur_task_logs")
+}
+
+// Sofia Task Log
+model SofiaTaskLog {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String    @db.Uuid @map("user_id")
+  taskTitle    String    @map("task_title")
+  status       String    @default("pending")
+  inputParams  String?   @map("input_params") @db.Text
+  outputResult String?   @map("output_result") @db.Text
+  durationMs   Int?      @map("duration_ms")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "sofia_task_logs_user_id_idx")
+  @@map("sofia_task_logs")
+}
+
+// Danilo Task Log
+model DaniloTaskLog {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String    @db.Uuid @map("user_id")
+  taskTitle    String    @map("task_title")
+  status       String    @default("pending")
+  inputParams  String?   @map("input_params") @db.Text
+  outputResult String?   @map("output_result") @db.Text
+  durationMs   Int?      @map("duration_ms")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "danilo_task_logs_user_id_idx")
+  @@map("danilo_task_logs")
+}
+
+// Maksym Task Log
+model MaksymTaskLog {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String    @db.Uuid @map("user_id")
+  taskTitle    String    @map("task_title")
+  status       String    @default("pending")
+  inputParams  String?   @map("input_params") @db.Text
+  outputResult String?   @map("output_result") @db.Text
+  durationMs   Int?      @map("duration_ms")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "maksym_task_logs_user_id_idx")
+  @@map("maksym_task_logs")
+}
+
+// Olena Task Log
+model OlenaTaskLog {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String    @db.Uuid @map("user_id")
+  taskTitle    String    @map("task_title")
+  status       String    @default("pending")
+  inputParams  String?   @map("input_params") @db.Text
+  outputResult String?   @map("output_result") @db.Text
+  durationMs   Int?      @map("duration_ms")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "olena_task_logs_user_id_idx")
+  @@map("olena_task_logs")
 }

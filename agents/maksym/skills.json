@@ -1,0 +1,21 @@
+{
+  "agentId": "maksym",
+  "skills": [
+    {
+      "name": "budget_lookup_connector",
+      "description": "Connects to internal financial spreadsheets/databases to pull vacancy budget lines."
+    },
+    {
+      "name": "tco_calculator_engine",
+      "description": "Calculates the fully-loaded cost of a candidate including recruitment, hardware, benefits, and local taxes."
+    },
+    {
+      "name": "taxation_rule_matrix",
+      "description": "Maps candidates to regional taxation models (FOP, B2B, employment contracts) for accurate cost projections."
+    },
+    {
+      "name": "limit_threshold_alerter",
+      "description": "Generates alert warnings when proposed salaries exceed initial department limits."
+    }
+  ]
+}

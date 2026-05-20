@@ -193,7 +193,7 @@ export async function requireAuth(c: any, next: any) {
     if (!user) {
       return c.json(errorResponse('UNAUTHORIZED', 'Invalid access token'), 401)
     }
-    c.set('user', user)
+    c.set('user', user.user)
     await next()
   } catch {
     return c.json(errorResponse('UNAUTHORIZED', 'Invalid access token'), 401)

@@ -1,0 +1,21 @@
+{
+  "agentId": "artur",
+  "skills": [
+    {
+      "name": "semantic_cv_parser",
+      "description": "Extracts structured sections (experience, education, skills, projects) from unstructured PDF and Word files."
+    },
+    {
+      "name": "skills_mapping_matrix",
+      "description": "Compares candidate capability profiles against role profiles using a semantic graph of IT technologies."
+    },
+    {
+      "name": "gap_detection_engine",
+      "description": "Finds career gaps, short tenures, and mismatching seniority levels in candidate histories."
+    },
+    {
+      "name": "interview_question_synthesizer",
+      "description": "Formulates tailored technical and behavioural questions targeting weak spots discovered during CV analysis."
+    }
+  ]
+}

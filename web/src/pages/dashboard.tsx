@@ -331,73 +331,122 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="grid gap-6">
-      <div>
-        <Typography variant="h2">Привіт, {auth.user?.displayName || auth.user?.email}!</Typography>
-        <Typography tone="muted">Ваша HR-панель керування та ІІ-асистенти</Typography>
+    <div className="grid gap-6 p-6 rounded-3xl premium-bg text-zinc-100 shadow-2xl border border-white/5 relative overflow-hidden">
+      {/* Decorative background glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] bg-blue-500/10 rounded-full blur-[90px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] bg-purple-500/10 rounded-full blur-[90px] pointer-events-none" />
+      <div className="absolute top-[40%] left-[30%] w-[250px] h-[250px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10 border-b border-white/10 pb-5">
+        <div>
+          <Typography variant="h2" className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
+            Привіт, <span className="text-gradient-primary">{auth.user?.displayName || auth.user?.email}</span>! 👋
+          </Typography>
+          <Typography tone="muted" className="text-zinc-400 mt-1 text-sm font-light">Ваша інтелектуальна HR-панель керування та ІІ-асистенти нового покоління</Typography>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.label} className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardDescription>{stat.label}</CardDescription>
-                <div className={`h-2 w-2 rounded-full ${stat.color}`} />
-              </div>
-              <CardTitle className="text-3xl">{stat.value}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button asChild variant="ghost" size="sm">
-                <Link to={stat.path}>Детальніше</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 relative z-10">
+        {stats.map((stat, idx) => {
+          const accents = [
+            'glass-card-accent-blue',
+            'glass-card-accent-emerald',
+            'glass-card-accent-purple',
+            'glass-card-accent-amber'
+          ]
+          const glowColors = [
+            'text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.35)]',
+            'text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.35)]',
+            'text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.35)]',
+            'text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.35)]'
+          ]
+          const labelIcons = [
+            <span className="material-symbols-outlined text-blue-400 text-sm">work</span>,
+            <span className="material-symbols-outlined text-emerald-400 text-sm">description</span>,
+            <span className="material-symbols-outlined text-purple-400 text-sm">handshake</span>,
+            <span className="material-symbols-outlined text-amber-400 text-sm">task_alt</span>
+          ]
+
+          return (
+            <Card key={stat.label} className={`glass-card ${accents[idx]} border-0 text-white`}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    {labelIcons[idx]}
+                    <CardDescription className="text-zinc-400 font-semibold text-[10px] uppercase tracking-wider">{stat.label}</CardDescription>
+                  </div>
+                  <div className={`h-2.5 w-2.5 rounded-full ${stat.color} shadow-[0_0_8px_currentColor]`} />
+                </div>
+                <CardTitle className={`text-4xl font-extrabold tracking-tight mt-1 ${glowColors[idx]}`}>
+                  {stat.value}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <Button asChild variant="ghost" size="sm" className="text-zinc-300 hover:text-white hover:bg-white/5 -ml-2 text-xs">
+                  <Link to={stat.path} className="flex items-center gap-1">
+                    <span>Детальніше</span>
+                    <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
       {/* Daily Digest & Mini Analytics */}
-      <div className="grid gap-6 lg:grid-cols-12">
+      <div className="grid gap-6 lg:grid-cols-12 relative z-10">
         {/* Daily Digest */}
         {digest.data && (
-          <Card className="lg:col-span-4 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <Card className="lg:col-span-4 flex flex-col justify-between glass-card border-0 text-white">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base font-semibold">Щоденне зведення</CardTitle>
-                  <CardDescription className="text-xs">Нове за останні 24 години</CardDescription>
+                  <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+                    <span className="material-symbols-outlined text-purple-400 text-lg">assessment</span>
+                    Щоденне зведення
+                  </CardTitle>
+                  <CardDescription className="text-xs text-zinc-400">Нове за останні 24 години</CardDescription>
                 </div>
-                <Badge variant="secondary" className="text-[10px]">{new Date(digest.data.date).toLocaleDateString('uk-UA')}</Badge>
+                <Badge variant="secondary" className="text-[10px] bg-white/10 hover:bg-white/15 text-zinc-200 border-0">
+                  {new Date(digest.data.date).toLocaleDateString('uk-UA')}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-3 flex-1 flex flex-col justify-center">
-              <div className="flex items-center justify-between rounded-lg bg-muted/40 p-3 border border-white/5">
-                <span className="text-xs text-muted-foreground">Нових вакансій</span>
-                <span className="text-lg font-bold text-blue-400">{digest.data.newVacancies}</span>
+              <div className="flex items-center justify-between rounded-xl bg-white/[0.02] p-3.5 border border-white/5 transition-all hover:bg-white/[0.05]">
+                <span className="text-xs text-zinc-400">Нових вакансій</span>
+                <span className="text-lg font-extrabold text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.3)]">{digest.data.newVacancies}</span>
               </div>
-              <div className="flex items-center justify-between rounded-lg bg-muted/40 p-3 border border-white/5">
-                <span className="text-xs text-muted-foreground">Нових резюме</span>
-                <span className="text-lg font-bold text-emerald-400">{digest.data.newResumes}</span>
+              <div className="flex items-center justify-between rounded-xl bg-white/[0.02] p-3.5 border border-white/5 transition-all hover:bg-white/[0.05]">
+                <span className="text-xs text-zinc-400">Нових резюме</span>
+                <span className="text-lg font-extrabold text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">{digest.data.newResumes}</span>
               </div>
-              <div className="flex items-center justify-between rounded-lg bg-muted/40 p-3 border border-white/5">
-                <span className="text-xs text-muted-foreground">Нових матчів</span>
-                <span className="text-lg font-bold text-purple-400">{digest.data.newMatches}</span>
+              <div className="flex items-center justify-between rounded-xl bg-white/[0.02] p-3.5 border border-white/5 transition-all hover:bg-white/[0.05]">
+                <span className="text-xs text-zinc-400">Нових матчів</span>
+                <span className="text-lg font-extrabold text-purple-400 drop-shadow-[0_0_8px_rgba(192,132,252,0.3)]">{digest.data.newMatches}</span>
               </div>
             </CardContent>
           </Card>
         )}
 
         {/* Mini Analytics widget */}
-        <Card className="lg:col-span-8 flex flex-col justify-between hover:shadow-md transition-shadow">
+        <Card className="lg:col-span-8 flex flex-col justify-between glass-card border-0 text-white">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-base font-semibold">Активність рекрутингу</CardTitle>
-                <CardDescription className="text-xs">Динаміка завантаження резюме та матчів</CardDescription>
+                <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+                  <span className="material-symbols-outlined text-emerald-400 text-lg">trending_up</span>
+                  Активність рекрутингу
+                </CardTitle>
+                <CardDescription className="text-xs text-zinc-400">Динаміка завантаження резюме та матчів</CardDescription>
               </div>
-              <Button asChild size="sm" variant="outline" className="text-xs h-8">
-                <Link to="/app/analytics">Аналітична панель</Link>
+              <Button asChild size="sm" variant="outline" className="text-xs h-8 border-white/10 text-zinc-300 hover:bg-white/5 hover:text-white">
+                <Link to="/app/analytics" className="flex items-center gap-1">
+                  <span>Аналітична панель</span>
+                  <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+                </Link>
               </Button>
             </div>
           </CardHeader>
@@ -412,52 +461,58 @@ export function DashboardPage() {
                   >
                     <defs>
                       <linearGradient id="miniResumes" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
                         <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="date" stroke="rgba(255,255,255,0.4)" fontSize={9} />
-                    <YAxis stroke="rgba(255,255,255,0.4)" fontSize={9} />
+                    <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" fontSize={9} />
+                    <YAxis stroke="rgba(255,255,255,0.3)" fontSize={9} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '10px' }}
+                      contentStyle={{ backgroundColor: '#13131b', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '10px', color: '#fff' }}
                     />
-                    <Area type="monotone" dataKey="Нові резюме" stroke="#10b981" fillOpacity={1} fill="url(#miniResumes)" strokeWidth={1.5} />
+                    <Area type="monotone" dataKey="Нові резюме" stroke="#10b981" fillOpacity={1} fill="url(#miniResumes)" strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="flex items-center justify-center h-full">
-                  <span className="text-xs text-muted-foreground">Немає даних</span>
+                  <span className="text-xs text-zinc-500">Немає даних</span>
                 </div>
               )}
             </div>
             
             {/* Avg Match score card */}
-            <div className="flex flex-col items-center justify-center p-4 bg-muted/40 rounded-xl border border-white/5 text-center h-full">
-              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Середній Match Score</span>
-              <span className="text-4xl font-extrabold text-teal-400 mb-1">{avgMatchScore}%</span>
+            <div className="flex flex-col items-center justify-center p-4 bg-white/[0.02] rounded-xl border border-white/5 text-center h-full hover:bg-white/[0.04] transition-all">
+              <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider mb-1">Середній Match Score</span>
+              <span className="text-4xl font-extrabold text-teal-400 drop-shadow-[0_0_10px_rgba(45,212,191,0.4)] mb-1">{avgMatchScore}%</span>
               <div className="w-full bg-white/10 rounded-full h-1.5 mt-1.5 overflow-hidden">
-                <div className="bg-teal-400 h-1.5 rounded-full" style={{ width: `${avgMatchScore}%` }} />
+                <div className="bg-gradient-to-r from-teal-400 to-emerald-400 h-1.5 rounded-full" style={{ width: `${avgMatchScore}%` }} />
               </div>
-              <span className="text-[9px] text-muted-foreground mt-2">Якість підбору</span>
+              <span className="text-[9px] text-zinc-500 mt-2">Рівень відповідності кандидатів</span>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Grid containing Tasks (Left) and AI Team (Right) */}
-      <div className="grid gap-6 lg:grid-cols-12">
+      <div className="grid gap-6 lg:grid-cols-12 relative z-10">
         {/* Left Column: Upcoming Tasks */}
         <div className="lg:col-span-5">
-          <Card className="h-full">
+          <Card className="h-full glass-card border-0 text-white">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Найближчі завдання</CardTitle>
-                  <CardDescription>На найближчі 24 години</CardDescription>
+                  <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+                    <span className="material-symbols-outlined text-orange-400 text-lg">calendar_today</span>
+                    Найближчі завдання
+                  </CardTitle>
+                  <CardDescription className="text-xs text-zinc-400">На найближчі 24 години</CardDescription>
                 </div>
-                <Button asChild size="sm">
-                  <Link to="/app/tasks">Усі завдання</Link>
+                <Button asChild size="sm" variant="ghost" className="text-xs text-zinc-300 hover:text-white hover:bg-white/5">
+                  <Link to="/app/tasks" className="flex items-center gap-0.5">
+                    <span>Усі</span>
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </Link>
                 </Button>
               </div>
             </CardHeader>
@@ -465,21 +520,30 @@ export function DashboardPage() {
               {tasks.data && tasks.data.length > 0 ? (
                 <div className="space-y-3">
                   {tasks.data.map((task: any) => (
-                    <div key={task.id} className="flex items-center justify-between rounded-lg border p-3">
+                    <div key={task.id} className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-3 hover:bg-white/[0.04] transition-all">
                       <div>
-                        <Typography variant="bodySm" className="font-medium">{task.title}</Typography>
-                        <Typography variant="bodySm" tone="muted">
+                        <Typography variant="bodySm" className="font-semibold text-zinc-200">{task.title}</Typography>
+                        <Typography variant="bodySm" tone="muted" className="text-[10px] text-zinc-500">
                           {new Date(task.scheduledAt).toLocaleString('uk-UA')}
                         </Typography>
                       </div>
-                      <Badge variant={task.eventType === 'interview' ? 'default' : 'secondary'}>
+                      <Badge variant="outline" className={`text-[9px] font-semibold border-0 ${
+                        task.eventType === 'interview' 
+                          ? 'bg-blue-500/10 text-blue-400' 
+                          : task.eventType === 'call' 
+                          ? 'bg-amber-500/10 text-amber-400' 
+                          : 'bg-zinc-500/10 text-zinc-400'
+                      }`}>
                         {task.eventType === 'interview' ? 'Співбесіда' : task.eventType === 'call' ? 'Дзвінок' : 'Зустріч'}
                       </Badge>
                     </div>
                   ))}
                 </div>
               ) : (
-                <Typography tone="muted" className="text-center py-8">Немає найближчих завдань</Typography>
+                <div className="flex flex-col items-center justify-center py-12 text-zinc-500">
+                  <span className="material-symbols-outlined text-3xl opacity-30 mb-1">event_busy</span>
+                  <span className="text-xs">Немає найближчих завдань</span>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -487,57 +551,67 @@ export function DashboardPage() {
 
         {/* Right Column: AI HR Team Widget */}
         <div className="lg:col-span-7">
-          <Card className="h-full border-primary/20 bg-gradient-to-br from-card to-secondary/5">
+          <Card className="h-full ai-card border-0 text-white">
             <CardHeader>
               <div>
-                <CardTitle className="flex items-center gap-2">
-                  <span className="inline-flex size-2 rounded-full bg-primary animate-pulse" />
-                  ІІ-Команда HR-Департаменту
+                <CardTitle className="flex items-center gap-2 text-white text-lg font-bold">
+                  <span className="inline-flex size-2.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_#6366f1]" />
+                  ІІ-Департамент HR-Агентів
                 </CardTitle>
-                <CardDescription>Узгоджена робота розумних агентів під вашим наглядом</CardDescription>
+                <CardDescription className="text-xs text-zinc-400">Скоординована робота автономних експертів під вашим повним наглядом</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-3">
-                {aiEmployees.map((agent) => (
-                  <div key={agent.id} className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-white/5 bg-card/40 p-4 transition-all duration-200 hover:border-primary/25 hover:bg-card/75">
-                    {/* Avatar with gradient */}
-                    <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${agent.gradient} shadow-md`}>
-                      {agent.icon}
-                    </div>
+                {aiEmployees.map((agent) => {
+                  const pulseClass = agent.statusType === 'active' 
+                    ? 'agent-pulse-active' 
+                    : agent.statusType === 'processing' 
+                    ? 'agent-pulse-processing' 
+                    : ''
 
-                    {/* Employee Profile info */}
-                    <div className="flex-1 space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold text-card-foreground">{agent.name}</span>
-                        <span className="text-xs text-muted-foreground">({agent.role})</span>
+                  return (
+                    <div key={agent.id} className={`flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-white/5 bg-white/[0.01] p-4 transition-all duration-300 hover:border-indigo-500/30 hover:bg-white/[0.03] ${pulseClass}`}>
+                      {/* Avatar with gradient */}
+                      <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${agent.gradient} shadow-lg shadow-black/40`}>
+                        {agent.icon}
+                      </div>
+
+                      {/* Employee Profile info */}
+                      <div className="flex-1 space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-bold text-white text-sm">{agent.name}</span>
+                          <span className="text-[10px] text-zinc-400">({agent.role})</span>
+                          
+                          {/* Status badge with pulsing dot */}
+                          <div className="flex items-center gap-1.5 ml-auto">
+                            <span className="relative flex h-2 w-2">
+                              {agent.statusType !== 'idle' && (
+                                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${agent.statusType === 'active' ? 'bg-emerald-400' : 'bg-purple-400'}`}></span>
+                              )}
+                              <span className={`relative inline-flex rounded-full h-2 w-2 ${agent.statusType === 'active' ? 'bg-emerald-500' : agent.statusType === 'processing' ? 'bg-purple-500' : 'bg-zinc-600'}`}></span>
+                            </span>
+                            <span className="text-[9px] uppercase font-bold tracking-wider text-zinc-400">
+                              {agent.statusType === 'idle' ? 'В очікуванні' : 'В роботі'}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-zinc-300 leading-normal font-light">{agent.description}</p>
                         
-                        {/* Status badge with pulsing dot */}
-                        <div className="flex items-center gap-1.5 ml-auto">
-                          <span className="relative flex h-2 w-2">
-                            {agent.statusType !== 'idle' && (
-                              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${agent.statusType === 'active' ? 'bg-emerald-400' : 'bg-purple-400'}`}></span>
-                            )}
-                            <span className={`relative inline-flex rounded-full h-2 w-2 ${agent.statusType === 'active' ? 'bg-emerald-500' : agent.statusType === 'processing' ? 'bg-purple-500' : 'bg-muted-foreground/50'}`}></span>
-                          </span>
-                          <span className="text-[10px] uppercase font-medium text-muted-foreground">{agent.statusType === 'idle' ? 'В очікуванні' : 'В роботі'}</span>
+                        {/* Active Status line */}
+                        <div className="flex items-center gap-1.5 pt-1">
+                          <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Статус:</span>
+                          <span className="text-xs italic text-zinc-400 font-light">{agent.status}</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground leading-normal">{agent.description}</p>
-                      
-                      {/* Active Status line */}
-                      <div className="flex items-center gap-1.5 pt-1">
-                        <span className="text-[11px] font-medium text-primary/80">Статус:</span>
-                        <span className="text-[11px] italic text-muted-foreground">{agent.status}</span>
-                      </div>
-                    </div>
 
-                    {/* Action button */}
-                    <Button onClick={() => handleOpenDialog(agent)} variant="outline" size="sm" className="sm:self-center shrink-0 border-primary/20 hover:border-primary hover:bg-primary/5">
-                      Дати завдання
-                    </Button>
-                  </div>
-                ))}
+                      {/* Action button */}
+                      <Button onClick={() => handleOpenDialog(agent)} variant="outline" size="sm" className="sm:self-center shrink-0 border-white/10 hover:border-indigo-500 hover:bg-indigo-500/10 hover:text-white text-zinc-300 text-xs">
+                        Дати завдання
+                      </Button>
+                    </div>
+                  )
+                })}
               </div>
             </CardContent>
           </Card>
@@ -547,33 +621,34 @@ export function DashboardPage() {
       {/* Task Delegation Dialog Modal */}
       <Dialog open={selectedAgent !== null} onOpenChange={(open) => !open && setSelectedAgent(null)}>
         {selectedAgent && (
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] border-white/10 bg-[#12121b] text-white">
             <DialogHeader>
-              <div className="flex items-center gap-3 pb-2 border-b">
-                <div className={`flex size-10 items-center justify-center rounded-lg bg-gradient-to-br ${selectedAgent.gradient}`}>
+              <div className="flex items-center gap-3 pb-3 border-b border-white/10">
+                <div className={`flex size-11 items-center justify-center rounded-xl bg-gradient-to-br ${selectedAgent.gradient} shadow-md`}>
                   {selectedAgent.icon}
                 </div>
                 <div>
-                  <DialogTitle className="text-lg">Завдання для {selectedAgent.name}</DialogTitle>
-                  <DialogDescription className="text-xs">{selectedAgent.role}</DialogDescription>
+                  <DialogTitle className="text-lg font-bold text-white">Завдання для {selectedAgent.name}</DialogTitle>
+                  <DialogDescription className="text-xs text-zinc-400">{selectedAgent.role}</DialogDescription>
                 </div>
               </div>
             </DialogHeader>
 
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-4 py-4 text-zinc-100">
               {/* Form Input fields depending on the selected Agent */}
               {selectedAgent.id === 'marta' && (
                 <div className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="searchQuery">Стек технологій або посада для пошуку</Label>
+                    <Label htmlFor="searchQuery" className="text-xs font-semibold text-zinc-300">Стек технологій або посада для пошуку</Label>
                     <Input
                       id="searchQuery"
                       placeholder="Наприклад: React Developer, Node.js Senior..."
                       value={taskParam1}
                       onChange={(e) => setTaskParam1(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white placeholder:text-zinc-500 focus-visible:ring-indigo-500/50"
                     />
                   </div>
-                  <Typography variant="bodySm" tone="muted">
+                  <Typography variant="bodySm" tone="muted" className="text-zinc-400 text-xs">
                     Марта автоматично знайде резюме та вакансії по цьому запиту на сайтах-партнерах.
                   </Typography>
                 </div>
@@ -581,21 +656,22 @@ export function DashboardPage() {
 
               {selectedAgent.id === 'artur' && (
                 <div className="space-y-4">
-                  <Typography variant="bodySm" className="font-medium text-foreground">
+                  <Typography variant="bodySm" className="font-medium text-zinc-300">
                     Артур оцінює відповідність кандидатів вимогам конкретної вакансії.
                   </Typography>
-                  <Typography variant="bodySm" tone="muted">
+                  <Typography variant="bodySm" tone="muted" className="text-zinc-400 text-xs">
                     Для оцінки кандидата перейдіть у розділ <strong>"Матчі"</strong> або відкрийте картку будь-якого кандидата і натисніть кнопку <strong>"Аналізувати сумісність"</strong>.
                   </Typography>
-                  <div className="rounded-lg bg-muted/50 p-3 border border-white/5 space-y-2">
-                    <span className="text-xs font-semibold uppercase text-primary tracking-wider">Швидка симуляція оцінки:</span>
+                  <div className="rounded-xl bg-white/[0.02] p-3 border border-white/5 space-y-2">
+                    <span className="text-xs font-bold uppercase text-indigo-400 tracking-wider">Швидка симуляція оцінки:</span>
                     <div className="grid gap-2">
-                      <Label htmlFor="assessRole">Назва Вакансії</Label>
+                      <Label htmlFor="assessRole" className="text-xs text-zinc-300">Назва Вакансії</Label>
                       <Input
                         id="assessRole"
                         placeholder="React Developer"
                         value={taskParam1}
                         onChange={(e) => setTaskParam1(e.target.value)}
+                        className="bg-white/5 border-white/10 text-white focus-visible:ring-indigo-500/50"
                       />
                     </div>
                   </div>
@@ -605,21 +681,23 @@ export function DashboardPage() {
               {selectedAgent.id === 'sofia' && (
                 <div className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="candidateName">Ім'я кандидата</Label>
+                    <Label htmlFor="candidateName" className="text-xs text-zinc-300">Ім'я кандидата</Label>
                     <Input
                       id="candidateName"
                       placeholder="Олександр Коваленко"
                       value={taskParam1}
                       onChange={(e) => setTaskParam1(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white focus-visible:ring-indigo-500/50"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="candidatePos">Посада</Label>
+                    <Label htmlFor="candidatePos" className="text-xs text-zinc-300">Посада</Label>
                     <Input
                       id="candidatePos"
                       placeholder="Node.js Developer"
                       value={taskParam2}
                       onChange={(e) => setTaskParam2(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white focus-visible:ring-indigo-500/50"
                     />
                   </div>
                 </div>
@@ -628,15 +706,16 @@ export function DashboardPage() {
               {selectedAgent.id === 'danilo' && (
                 <div className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="salaryPosition">Назва вакансії / Стек для аналізу ринку</Label>
+                    <Label htmlFor="salaryPosition" className="text-xs text-zinc-300">Назва вакансії / Стек для аналізу ринку</Label>
                     <Input
                       id="salaryPosition"
                       placeholder="Senior JavaScript Engineer"
                       value={taskParam1}
                       onChange={(e) => setTaskParam1(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white focus-visible:ring-indigo-500/50"
                     />
                   </div>
-                  <Typography variant="bodySm" tone="muted">
+                  <Typography variant="bodySm" tone="muted" className="text-zinc-400 text-xs">
                     Данило проаналізує зарплатні вилки, медіану ринку та дасть рекомендації щодо бюджету.
                   </Typography>
                 </div>
@@ -645,25 +724,27 @@ export function DashboardPage() {
               {selectedAgent.id === 'maksym' && (
                 <div className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="trackSalaryPosition">Посада для моніторингу</Label>
+                    <Label htmlFor="trackSalaryPosition" className="text-xs text-zinc-300">Посада для моніторингу</Label>
                     <Input
                       id="trackSalaryPosition"
                       placeholder="React Developer"
                       value={taskParam1}
                       onChange={(e) => setTaskParam1(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white focus-visible:ring-indigo-500/50"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="trackSalaryBudget">Бюджет компанії (USD)</Label>
+                    <Label htmlFor="trackSalaryBudget" className="text-xs text-zinc-300">Бюджет компанії (USD)</Label>
                     <Input
                       id="trackSalaryBudget"
                       type="number"
                       placeholder="2500"
                       value={taskParam2}
                       onChange={(e) => setTaskParam2(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white focus-visible:ring-indigo-500/50"
                     />
                   </div>
-                  <Typography variant="bodySm" tone="muted">
+                  <Typography variant="bodySm" tone="muted" className="text-zinc-400 text-xs">
                     Максим порівняє бюджет вакансії з актуальними ринковими даними та надішле попередження у разі суттєвого відхилення.
                   </Typography>
                 </div>
@@ -672,24 +753,26 @@ export function DashboardPage() {
               {selectedAgent.id === 'olena' && (
                 <div className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="competitorCompany">Компанія-конкурент</Label>
+                    <Label htmlFor="competitorCompany" className="text-xs text-zinc-300">Компанія-конкурент</Label>
                     <Input
                       id="competitorCompany"
                       placeholder="SoftServe"
                       value={taskParam1}
                       onChange={(e) => setTaskParam1(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white focus-visible:ring-indigo-500/50"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="competitorNiche">Ніша або напрямок</Label>
+                    <Label htmlFor="competitorNiche" className="text-xs text-zinc-300">Ніша або напрямок</Label>
                     <Input
                       id="competitorNiche"
                       placeholder="FinTech"
                       value={taskParam2}
                       onChange={(e) => setTaskParam2(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white focus-visible:ring-indigo-500/50"
                     />
                   </div>
-                  <Typography variant="bodySm" tone="muted">
+                  <Typography variant="bodySm" tone="muted" className="text-zinc-400 text-xs">
                     Олена здійснить розвідку відкритих вакансій конкурента у вказаній ніші та сформує аналітичний звіт.
                   </Typography>
                 </div>
@@ -698,26 +781,26 @@ export function DashboardPage() {
               {/* Progress animation loader */}
               {loadingSimulation && (
                 <div className="flex flex-col items-center justify-center py-6 gap-2">
-                  <Spinner className="size-8 text-primary" />
-                  <span className="text-sm font-medium text-muted-foreground animate-pulse">Агент аналізує дані та генерує звіт...</span>
+                  <Spinner className="size-8 text-indigo-500" />
+                  <span className="text-xs font-semibold text-zinc-400 animate-pulse">Агент аналізує дані та генерує звіт...</span>
                 </div>
               )}
 
               {/* Result output window */}
               {simulationResult && (
-                <div className="mt-2 space-y-3 rounded-lg border bg-muted/30 p-4">
+                <div className="mt-2 space-y-3 rounded-xl border border-white/5 bg-white/[0.02] p-4 text-zinc-100">
                   {simulationResult.type === 'email' && (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between border-b pb-1 text-xs text-muted-foreground font-semibold">
+                      <div className="flex items-center justify-between border-b border-white/5 pb-1.5 text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
                         <span>Тема: {simulationResult.subject}</span>
-                        <Badge variant="outline">Email Outreach</Badge>
+                        <Badge variant="outline" className="text-[9px] bg-purple-500/10 text-purple-400 border-0">Email Outreach</Badge>
                       </div>
-                      <pre className="text-xs font-sans whitespace-pre-wrap leading-relaxed text-card-foreground bg-black/20 p-2.5 rounded border border-white/5 font-mono">
+                      <pre className="text-[11px] font-mono whitespace-pre-wrap leading-relaxed text-zinc-300 bg-black/45 p-3 rounded-lg border border-white/5 select-text">
                         {simulationResult.content}
                       </pre>
                       <Button onClick={() => {
                         navigator.clipboard.writeText(simulationResult.content)
-                      }} size="sm" className="w-full">
+                      }} size="sm" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg h-9">
                         Скопіювати в буфер обміну
                       </Button>
                     </div>
@@ -725,30 +808,30 @@ export function DashboardPage() {
 
                   {simulationResult.type === 'salary' && (
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between border-b pb-1.5 font-semibold text-sm">
-                        <span className="text-foreground">Аналітика зарплат: {simulationResult.position}</span>
-                        <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400">Аналіз ринку</Badge>
+                      <div className="flex items-center justify-between border-b border-white/5 pb-1.5 font-bold text-xs uppercase tracking-wider text-zinc-300">
+                        <span>Аналітика зарплат: {simulationResult.position}</span>
+                        <Badge variant="outline" className="text-[9px] bg-emerald-500/10 text-emerald-400 border-0">Аналіз ринку</Badge>
                       </div>
                       <div className="grid grid-cols-3 gap-2 text-center">
-                        <div className="bg-muted p-2 rounded border">
-                          <span className="block text-[10px] text-muted-foreground uppercase font-semibold">Мінімум</span>
-                          <span className="text-sm font-bold text-foreground">${simulationResult.min}</span>
+                        <div className="bg-white/5 p-2.5 rounded-lg border border-white/5">
+                          <span className="block text-[9px] text-zinc-400 uppercase font-semibold">Мінімум</span>
+                          <span className="text-xs font-bold text-zinc-200">${simulationResult.min}</span>
                         </div>
-                        <div className="bg-primary/10 border-primary/20 p-2 rounded border">
-                          <span className="block text-[10px] text-primary/80 uppercase font-semibold">Медіана</span>
-                          <span className="text-sm font-bold text-primary">${simulationResult.median}</span>
+                        <div className="bg-indigo-500/10 border-indigo-500/20 p-2.5 rounded-lg border">
+                          <span className="block text-[9px] text-indigo-400 uppercase font-bold">Медіана</span>
+                          <span className="text-xs font-bold text-indigo-300">${simulationResult.median}</span>
                         </div>
-                        <div className="bg-muted p-2 rounded border">
-                          <span className="block text-[10px] text-muted-foreground uppercase font-semibold">Максимум</span>
-                          <span className="text-sm font-bold text-foreground">${simulationResult.max}</span>
+                        <div className="bg-white/5 p-2.5 rounded-lg border border-white/5">
+                          <span className="block text-[9px] text-zinc-400 uppercase font-semibold">Максимум</span>
+                          <span className="text-xs font-bold text-zinc-200">${simulationResult.max}</span>
                         </div>
                       </div>
                       <div className="space-y-1">
                         <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">Попит на ринку:</span>
-                          <span className="font-semibold text-primary">{simulationResult.demand}</span>
+                          <span className="text-zinc-400">Попит на ринку:</span>
+                          <span className="font-bold text-indigo-400">{simulationResult.demand}</span>
                         </div>
-                        <p className="text-[11px] text-muted-foreground italic leading-relaxed pt-1.5 border-t border-white/5">
+                        <p className="text-[11px] text-zinc-400 italic leading-relaxed pt-2 border-t border-white/5">
                           {simulationResult.advice}
                         </p>
                       </div>
@@ -757,28 +840,28 @@ export function DashboardPage() {
 
                   {simulationResult.type === 'assessment' && (
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between border-b pb-1.5 font-semibold text-sm">
-                        <span className="text-foreground">Асесмент відповідності</span>
-                        <Badge variant="secondary" className="bg-teal-500/10 text-teal-400">
+                      <div className="flex items-center justify-between border-b border-white/5 pb-1.5 font-bold text-xs uppercase tracking-wider text-zinc-300">
+                        <span>Асесмент відповідності</span>
+                        <Badge variant="secondary" className="text-[9px] bg-teal-500/10 text-teal-400 border-0 font-bold">
                           Match Score: {simulationResult.score}%
                         </Badge>
                       </div>
-                      <div className="space-y-2 text-left">
+                      <div className="space-y-3 text-left">
                         <div>
-                          <span className="text-xs font-semibold text-emerald-400 block mb-1">Сильні сторони:</span>
-                          <ul className="list-disc pl-4 text-xs text-muted-foreground space-y-1">
+                          <span className="text-[10px] font-bold text-emerald-400 block mb-1 uppercase tracking-wider">Сильні сторони:</span>
+                          <ul className="list-disc pl-4 text-xs text-zinc-300 space-y-1 font-light">
                             {simulationResult.pros.map((p: string, i: number) => <li key={i}>{p}</li>)}
                           </ul>
                         </div>
                         <div>
-                          <span className="text-xs font-semibold text-rose-400 block mb-1">Ризики / Слабкі сторони:</span>
-                          <ul className="list-disc pl-4 text-xs text-muted-foreground space-y-1">
+                          <span className="text-[10px] font-bold text-rose-400 block mb-1 uppercase tracking-wider">Ризики / Слабкі сторони:</span>
+                          <ul className="list-disc pl-4 text-xs text-zinc-300 space-y-1 font-light">
                             {simulationResult.cons.map((c: string, i: number) => <li key={i}>{c}</li>)}
                           </ul>
                         </div>
                         <div>
-                          <span className="text-xs font-semibold text-primary block mb-1">Рекомендовані питання для інтерв'ю:</span>
-                          <ol className="list-decimal pl-4 text-xs text-muted-foreground space-y-1">
+                          <span className="text-[10px] font-bold text-indigo-400 block mb-1 uppercase tracking-wider">Рекомендовані питання для інтерв'ю:</span>
+                          <ol className="list-decimal pl-4 text-xs text-zinc-300 space-y-1 font-light">
                             {simulationResult.questions.map((q: string, i: number) => <li key={i}>{q}</li>)}
                           </ol>
                         </div>
@@ -787,22 +870,22 @@ export function DashboardPage() {
                   )}
 
                   {simulationResult.type === 'sourcing' && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between border-b pb-1.5 font-semibold text-sm">
-                        <span className="text-foreground">Сорсинг запит розширено</span>
-                        <Badge variant="outline" className="bg-blue-500/10 text-blue-400">Розширення пошуку</Badge>
+                    <div className="space-y-3 font-light text-xs">
+                      <div className="flex items-center justify-between border-b border-white/5 pb-1.5 font-bold text-xs uppercase tracking-wider text-zinc-300">
+                        <span>Сорсинг запит розширено</span>
+                        <Badge variant="outline" className="text-[9px] bg-blue-500/10 text-blue-400 border-0">Розширення пошуку</Badge>
                       </div>
-                      <div className="space-y-2 text-left text-xs text-muted-foreground">
+                      <div className="space-y-2 text-left text-zinc-300">
                         <div>
-                          <span className="font-semibold text-card-foreground">Синоніми та розширення:</span>
-                          <div className="flex flex-wrap gap-1 mt-1">
+                          <span className="font-semibold text-white text-[10px] uppercase tracking-wider">Синоніми та розширення:</span>
+                          <div className="flex flex-wrap gap-1 mt-1.5">
                             {simulationResult.expansions?.map((term: string, i: number) => (
-                              <Badge key={i} variant="secondary" className="text-[10px]">{term}</Badge>
+                              <Badge key={i} variant="secondary" className="text-[9px] bg-white/5 border border-white/5 text-zinc-300">{term}</Badge>
                             ))}
                           </div>
                         </div>
                         <div>
-                          <span className="font-semibold text-card-foreground">Суміжні посади:</span>
+                          <span className="font-semibold text-white text-[10px] uppercase tracking-wider">Суміжні посади:</span>
                           <ul className="list-disc pl-4 mt-1 space-y-1">
                             {simulationResult.titles?.map((title: string, i: number) => (
                               <li key={i}>{title}</li>
@@ -810,8 +893,8 @@ export function DashboardPage() {
                           </ul>
                         </div>
                         <div>
-                          <span className="font-semibold text-card-foreground">Boolean рядок пошуку:</span>
-                          <code className="block bg-black/20 p-2 rounded mt-1 font-mono text-[10px] select-all cursor-pointer">
+                          <span className="font-semibold text-white text-[10px] uppercase tracking-wider">Boolean рядок пошуку:</span>
+                          <code className="block bg-black/45 p-2 rounded-lg mt-1.5 font-mono text-[10px] border border-white/5 select-all text-indigo-300">
                             {simulationResult.booleanSearch}
                           </code>
                         </div>
@@ -827,7 +910,7 @@ export function DashboardPage() {
                           }
                         })
                         setSelectedAgent(null)
-                      }} className="w-full mt-2" size="sm">
+                      }} className="w-full mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg h-9">
                         Перейти до результатів пошуку
                       </Button>
                     </div>
@@ -835,24 +918,24 @@ export function DashboardPage() {
 
                   {simulationResult.type === 'salary-track' && (
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between border-b pb-1.5 font-semibold text-sm">
-                        <span className="text-foreground">Аналітика бюджету: {simulationResult.position}</span>
-                        <Badge variant={simulationResult.alertTriggered ? 'destructive' : 'outline'} className={!simulationResult.alertTriggered ? 'bg-emerald-500/10 text-emerald-400' : ''}>
+                      <div className="flex items-center justify-between border-b border-white/5 pb-1.5 font-bold text-xs uppercase tracking-wider text-zinc-300">
+                        <span>Аналітика бюджету: {simulationResult.position}</span>
+                        <Badge variant={simulationResult.alertTriggered ? 'destructive' : 'outline'} className={!simulationResult.alertTriggered ? 'bg-emerald-500/10 text-emerald-400 border-0 text-[9px]' : 'text-[9px]'}>
                           {simulationResult.comparison === 'above_market' ? 'Вище ринку' : simulationResult.comparison === 'within_market' ? 'В межах ринку' : 'Нижче ринку'}
                         </Badge>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-center">
-                        <div className="bg-muted p-2 rounded border">
-                          <span className="block text-[10px] text-muted-foreground uppercase font-semibold">Наш бюджет</span>
-                          <span className="text-sm font-bold text-foreground">${simulationResult.budget}</span>
+                        <div className="bg-white/5 p-2.5 rounded-lg border border-white/5">
+                          <span className="block text-[9px] text-zinc-400 uppercase font-semibold">Наш бюджет</span>
+                          <span className="text-xs font-bold text-zinc-200">${simulationResult.budget}</span>
                         </div>
-                        <div className="bg-muted p-2 rounded border">
-                          <span className="block text-[10px] text-muted-foreground uppercase font-semibold">Медіана ринку</span>
-                          <span className="text-sm font-bold text-foreground">${simulationResult.marketMedian}</span>
+                        <div className="bg-white/5 p-2.5 rounded-lg border border-white/5">
+                          <span className="block text-[9px] text-zinc-400 uppercase font-semibold">Медіана ринку</span>
+                          <span className="text-xs font-bold text-zinc-200">${simulationResult.marketMedian}</span>
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[11px] text-muted-foreground italic leading-relaxed pt-1.5 border-t border-white/5">
+                        <p className="text-[11px] text-zinc-400 italic leading-relaxed pt-2 border-t border-white/5">
                           {simulationResult.advice}
                         </p>
                       </div>
@@ -861,30 +944,30 @@ export function DashboardPage() {
 
                   {simulationResult.type === 'competitor-track' && (
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between border-b pb-1.5 font-semibold text-sm">
-                        <span className="text-foreground">Розвідка конкурента: {simulationResult.company}</span>
-                        <Badge variant={simulationResult.alertLevel === 'high' ? 'destructive' : simulationResult.alertLevel === 'medium' ? 'default' : 'secondary'}>
+                      <div className="flex items-center justify-between border-b border-white/5 pb-1.5 font-bold text-xs uppercase tracking-wider text-zinc-300">
+                        <span>Розвідка конкурента: {simulationResult.company}</span>
+                        <Badge variant={simulationResult.alertLevel === 'high' ? 'destructive' : simulationResult.alertLevel === 'medium' ? 'default' : 'secondary'} className="text-[9px] border-0">
                           Загроза: {simulationResult.alertLevel === 'high' ? 'Висока' : simulationResult.alertLevel === 'medium' ? 'Середня' : 'Низька'}
                         </Badge>
                       </div>
-                      <div className="space-y-2 text-left text-xs">
+                      <div className="space-y-3 text-left text-xs font-light text-zinc-300">
                         <div>
-                          <span className="font-semibold text-card-foreground">Активні вакансії ({simulationResult.niche}):</span>
-                          <ul className="list-disc pl-4 mt-1 space-y-1 text-muted-foreground">
+                          <span className="font-bold text-white text-[10px] uppercase tracking-wider block mb-1">Активні вакансії ({simulationResult.niche}):</span>
+                          <ul className="list-disc pl-4 space-y-1 text-zinc-400">
                             {simulationResult.activeVacancies?.map((v: any, i: number) => (
-                              <li key={i}>{v.title} <span className="text-[10px] text-muted-foreground/70">(відкрита: {v.dateOpened})</span></li>
+                              <li key={i}>{v.title} <span className="text-[9px] text-zinc-500">(відкрита: {v.dateOpened})</span></li>
                             ))}
                           </ul>
                         </div>
                         <div>
-                          <span className="font-semibold text-card-foreground">Закриті вакансії:</span>
-                          <ul className="list-disc pl-4 mt-1 space-y-1 text-muted-foreground">
+                          <span className="font-bold text-white text-[10px] uppercase tracking-wider block mb-1">Закриті вакансії:</span>
+                          <ul className="list-disc pl-4 space-y-1 text-zinc-400">
                             {simulationResult.closedVacancies?.map((v: any, i: number) => (
-                              <li key={i}>{v.title} <span className="text-[10px] text-muted-foreground/70">(закрита: {v.dateClosed})</span></li>
+                              <li key={i}>{v.title} <span className="text-[9px] text-zinc-500">(закрита: {v.dateClosed})</span></li>
                             ))}
                           </ul>
                         </div>
-                        <p className="text-[11px] text-muted-foreground italic leading-relaxed pt-1.5 border-t border-white/5">
+                        <p className="text-[11px] text-zinc-400 italic leading-relaxed pt-2 border-t border-white/5">
                           {simulationResult.report}
                         </p>
                       </div>
@@ -894,12 +977,12 @@ export function DashboardPage() {
               )}
             </div>
 
-            <div className="flex justify-end gap-2 border-t pt-3">
-              <Button variant="ghost" size="sm" onClick={() => setSelectedAgent(null)}>
+            <div className="flex justify-end gap-2 border-t border-white/10 pt-3.5">
+              <Button variant="ghost" size="sm" onClick={() => setSelectedAgent(null)} className="text-zinc-300 hover:text-white hover:bg-white/5 text-xs">
                 Закрити
               </Button>
               {!simulationResult && !loadingSimulation && (
-                <Button size="sm" onClick={handleExecuteTask}>
+                <Button size="sm" onClick={handleExecuteTask} className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg h-9 px-4">
                   {selectedAgent.id === 'marta' ? 'Запустити пошук' : 'Доручити роботу'}
                 </Button>
               )}

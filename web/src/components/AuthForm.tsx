@@ -8,25 +8,10 @@ import {
 import type { z } from 'zod'
 import { useId, useState } from 'react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 import { ApiRequestError } from '@/lib/api'
 import { useAuth } from '@/lib/use-auth'
+import { Typography } from '@/components/ui/typography'
 
 type AuthMode = 'login' | 'register'
 type FieldName = 'displayName' | 'email' | 'password'
@@ -45,7 +30,7 @@ const emptyDraft: AuthDraft = {
 }
 
 export function AuthForm() {
-  const [mode, setMode] = useState<AuthMode>('register')
+  const [mode, setMode] = useState<AuthMode>('login')
   const [draft, setDraft] = useState<AuthDraft>(emptyDraft)
 
   function updateDraft(nextDraft: Partial<AuthDraft>) {
@@ -53,37 +38,49 @@ export function AuthForm() {
   }
 
   return (
-    <Card className="w-full" aria-label="Authentication">
-      <CardHeader>
-        <CardTitle>Доступ до акаунту</CardTitle>
-        <CardDescription>
-          Створіть акаунт або увійдіть в існуючий.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs
-          value={mode}
-          onValueChange={(nextMode) => {
-            if (nextMode === 'login' || nextMode === 'register') {
-              setMode(nextMode)
-            }
-          }}
-          className="mb-6"
+    <div className="bg-surface-container-lowest/80 backdrop-blur-md rounded-[24px] border border-outline-variant shadow-[0_20px_25px_-5px_rgba(15,23,42,0.1)] overflow-hidden w-full">
+      {/* Tabs */}
+      <div className="flex border-b border-outline-variant">
+        <Typography
+          as="button"
+          id="tab-login"
+          type="button"
+          variant="h4"
+          className={cn(
+            "flex-1 py-lg transition-colors cursor-pointer",
+            mode === 'login'
+              ? "text-primary border-b-2 border-primary bg-surface-container-lowest"
+              : "text-on-surface-variant border-b-2 border-transparent hover:text-primary bg-surface-container-low/50"
+          )}
+          onClick={() => setMode('login')}
         >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="register">Реєстрація</TabsTrigger>
-            <TabsTrigger value="login">Вхід</TabsTrigger>
-          </TabsList>
+          Увійти
+        </Typography>
+        <Typography
+          as="button"
+          id="tab-register"
+          type="button"
+          variant="h4"
+          className={cn(
+            "flex-1 py-lg transition-colors cursor-pointer",
+            mode === 'register'
+              ? "text-primary border-b-2 border-primary bg-surface-container-lowest"
+              : "text-on-surface-variant border-b-2 border-transparent hover:text-primary bg-surface-container-low/50"
+          )}
+          onClick={() => setMode('register')}
+        >
+          Реєстрація
+        </Typography>
+      </div>
 
-          <TabsContent value="register" forceMount hidden={mode !== 'register'} className="mt-6">
-            {mode === 'register' && <RegisterForm draft={draft} onDraftChange={updateDraft} />}
-          </TabsContent>
-          <TabsContent value="login" forceMount hidden={mode !== 'login'} className="mt-6">
-            {mode === 'login' && <LoginForm draft={draft} onDraftChange={updateDraft} />}
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+      <div className="p-xl">
+        {mode === 'login' ? (
+          <LoginForm draft={draft} onDraftChange={updateDraft} />
+        ) : (
+          <RegisterForm draft={draft} onDraftChange={updateDraft} />
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -96,13 +93,11 @@ function RegisterForm({
 }) {
   const auth = useAuth()
   const displayNameId = useId()
-  const displayNameErrorId = useId()
   const emailId = useId()
-  const emailErrorId = useId()
   const passwordId = useId()
-  const passwordErrorId = useId()
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm({
     defaultValues: draft,
@@ -131,24 +126,40 @@ function RegisterForm({
 
   return (
     <form
+      id="form-register"
+      className="flex flex-col gap-lg"
       onSubmit={(event) => {
         event.preventDefault()
         void form.handleSubmit()
       }}
     >
-      <FieldGroup className="gap-4">
-        <form.Field
-          name="displayName"
-          children={(field) => (
-            <Field data-invalid={hasErrors(fieldErrors.displayName)}>
-              <FieldLabel htmlFor={displayNameId}>Ім'я</FieldLabel>
-              <Input
+      <form.Field
+        name="displayName"
+        children={(field) => (
+          <div className="flex flex-col gap-xs">
+            <Typography
+              as="label"
+              htmlFor={displayNameId}
+              variant="label"
+              className="text-on-surface"
+            >
+              Ім'я
+            </Typography>
+            <div className="relative">
+              <Typography
+                as="span"
+                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
+              >
+                person
+              </Typography>
+              <input
                 id={displayNameId}
                 name={field.name}
                 value={field.state.value ?? ''}
+                type="text"
                 autoComplete="name"
-                aria-invalid={hasErrors(fieldErrors.displayName)}
-                aria-describedby={errorId(fieldErrors.displayName, displayNameErrorId)}
+                placeholder="Ваше ім'я"
+                className="w-full pl-[48px] pr-md py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                 onBlur={field.handleBlur}
                 onChange={(event) => {
                   const value = event.target.value
@@ -158,25 +169,47 @@ function RegisterForm({
                   setFormError(null)
                 }}
               />
-              <FieldError id={displayNameErrorId} errors={fieldErrors.displayName} />
-            </Field>
-          )}
-        />
+            </div>
+            {hasErrors(fieldErrors.displayName) && (
+              <Typography
+                as="span"
+                variant="caption"
+                tone="destructive"
+                className="mt-xs block"
+              >
+                {fieldErrors.displayName?.[0]?.message}
+              </Typography>
+            )}
+          </div>
+        )}
+      />
 
-        <form.Field
-          name="email"
-          children={(field) => (
-            <Field data-invalid={hasErrors(fieldErrors.email)}>
-              <FieldLabel htmlFor={emailId}>Email</FieldLabel>
-              <Input
+      <form.Field
+        name="email"
+        children={(field) => (
+          <div className="flex flex-col gap-xs">
+            <Typography
+              as="label"
+              htmlFor={emailId}
+              variant="label"
+              className="text-on-surface"
+            >
+              Email
+            </Typography>
+            <div className="relative">
+              <Typography
+                as="span"
+                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
+              >
+                mail
+              </Typography>
+              <input
                 id={emailId}
                 name={field.name}
                 value={field.state.value}
-                type="text"
-                inputMode="email"
-                autoComplete="email"
-                aria-invalid={hasErrors(fieldErrors.email)}
-                aria-describedby={errorId(fieldErrors.email, emailErrorId)}
+                type="email"
+                placeholder="name@company.com"
+                className="w-full pl-[48px] pr-md py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                 onBlur={field.handleBlur}
                 onChange={(event) => {
                   const value = event.target.value
@@ -186,24 +219,48 @@ function RegisterForm({
                   setFormError(null)
                 }}
               />
-              <FieldError id={emailErrorId} errors={fieldErrors.email} />
-            </Field>
-          )}
-        />
+            </div>
+            {hasErrors(fieldErrors.email) && (
+              <Typography
+                as="span"
+                variant="caption"
+                tone="destructive"
+                className="mt-xs block"
+              >
+                {fieldErrors.email?.[0]?.message}
+              </Typography>
+            )}
+          </div>
+        )}
+      />
 
-        <form.Field
-          name="password"
-          children={(field) => (
-            <Field data-invalid={hasErrors(fieldErrors.password)}>
-              <FieldLabel htmlFor={passwordId}>Пароль</FieldLabel>
-              <Input
+      <form.Field
+        name="password"
+        children={(field) => (
+          <div className="flex flex-col gap-xs">
+            <Typography
+              as="label"
+              htmlFor={passwordId}
+              variant="label"
+              className="text-on-surface"
+            >
+              Пароль
+            </Typography>
+            <div className="relative">
+              <Typography
+                as="span"
+                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
+              >
+                lock
+              </Typography>
+              <input
                 id={passwordId}
                 name={field.name}
                 value={field.state.value}
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
-                aria-invalid={hasErrors(fieldErrors.password)}
-                aria-describedby={errorId(fieldErrors.password, passwordErrorId)}
+                placeholder="Створіть пароль"
+                className="w-full pl-[48px] pr-[48px] py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                 onBlur={field.handleBlur}
                 onChange={(event) => {
                   const value = event.target.value
@@ -213,22 +270,66 @@ function RegisterForm({
                   setFormError(null)
                 }}
               />
-              <FieldError id={passwordErrorId} errors={fieldErrors.password} />
-            </Field>
-          )}
-        />
+              <Typography
+                as="button"
+                type="button"
+                className="absolute right-md top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <Typography
+                  as="span"
+                  className="material-symbols-outlined select-none"
+                >
+                  {showPassword ? 'visibility_off' : 'visibility'}
+                </Typography>
+              </Typography>
+            </div>
+            {hasErrors(fieldErrors.password) && (
+              <Typography
+                as="span"
+                variant="caption"
+                tone="destructive"
+                className="mt-xs block"
+              >
+                {fieldErrors.password?.[0]?.message}
+              </Typography>
+            )}
+          </div>
+        )}
+      />
 
-        <FormAlert message={formError} />
+      <FormAlert message={formError} />
 
-        <form.Subscribe
-          selector={(state) => state.isSubmitting}
-          children={(isSubmitting) => (
-            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Створення...' : 'Створити акаунт'}
-            </Button>
-          )}
-        />
-      </FieldGroup>
+      <form.Subscribe
+        selector={(state) => state.isSubmitting}
+        children={(isSubmitting) => (
+          <Typography
+            as="button"
+            type="submit"
+            disabled={isSubmitting}
+            variant="h4"
+            className="w-full bg-secondary text-on-secondary py-[14px] rounded-lg shadow-sm hover:bg-on-secondary-fixed-variant transition-colors mt-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {isSubmitting ? 'Створення...' : 'Зареєструватися'}
+          </Typography>
+        )}
+      />
+
+      <Typography
+        as="p"
+        variant="caption"
+        className="text-center text-on-surface-variant mt-sm"
+      >
+        Натискаючи кнопку, ви погоджуєтесь з{' '}
+        <Typography
+          as="a"
+          variant="caption"
+          className="text-primary hover:underline"
+          href="#"
+        >
+          Умовами використання
+        </Typography>
+      </Typography>
     </form>
   )
 }
@@ -242,11 +343,10 @@ function LoginForm({
 }) {
   const auth = useAuth()
   const emailId = useId()
-  const emailErrorId = useId()
   const passwordId = useId()
-  const passwordErrorId = useId()
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm({
     defaultValues: {
@@ -278,26 +378,39 @@ function LoginForm({
 
   return (
     <form
+      id="form-login"
+      className="flex flex-col gap-lg"
       onSubmit={(event) => {
         event.preventDefault()
         void form.handleSubmit()
       }}
     >
-      <FieldGroup className="gap-4">
-        <form.Field
-          name="email"
-          children={(field) => (
-            <Field data-invalid={hasErrors(fieldErrors.email)}>
-              <FieldLabel htmlFor={emailId}>Email</FieldLabel>
-              <Input
+      <form.Field
+        name="email"
+        children={(field) => (
+          <div className="flex flex-col gap-xs">
+            <Typography
+              as="label"
+              htmlFor={emailId}
+              variant="label"
+              className="text-on-surface"
+            >
+              Email
+            </Typography>
+            <div className="relative">
+              <Typography
+                as="span"
+                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
+              >
+                mail
+              </Typography>
+              <input
                 id={emailId}
                 name={field.name}
                 value={field.state.value}
-                type="text"
-                inputMode="email"
-                autoComplete="email"
-                aria-invalid={hasErrors(fieldErrors.email)}
-                aria-describedby={errorId(fieldErrors.email, emailErrorId)}
+                type="email"
+                placeholder="name@company.com"
+                className="w-full pl-[48px] pr-md py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                 onBlur={field.handleBlur}
                 onChange={(event) => {
                   const value = event.target.value
@@ -307,24 +420,48 @@ function LoginForm({
                   setFormError(null)
                 }}
               />
-              <FieldError id={emailErrorId} errors={fieldErrors.email} />
-            </Field>
-          )}
-        />
+            </div>
+            {hasErrors(fieldErrors.email) && (
+              <Typography
+                as="span"
+                variant="caption"
+                tone="destructive"
+                className="mt-xs block"
+              >
+                {fieldErrors.email?.[0]?.message}
+              </Typography>
+            )}
+          </div>
+        )}
+      />
 
-        <form.Field
-          name="password"
-          children={(field) => (
-            <Field data-invalid={hasErrors(fieldErrors.password)}>
-              <FieldLabel htmlFor={passwordId}>Пароль</FieldLabel>
-              <Input
+      <form.Field
+        name="password"
+        children={(field) => (
+          <div className="flex flex-col gap-xs">
+            <Typography
+              as="label"
+              htmlFor={passwordId}
+              variant="label"
+              className="text-on-surface"
+            >
+              Пароль
+            </Typography>
+            <div className="relative">
+              <Typography
+                as="span"
+                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline select-none pointer-events-none"
+              >
+                lock
+              </Typography>
+              <input
                 id={passwordId}
                 name={field.name}
                 value={field.state.value}
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
-                aria-invalid={hasErrors(fieldErrors.password)}
-                aria-describedby={errorId(fieldErrors.password, passwordErrorId)}
+                placeholder="••••••••"
+                className="w-full pl-[48px] pr-[48px] py-[12px] bg-surface rounded-lg border border-outline-variant text-on-surface font-body text-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                 onBlur={field.handleBlur}
                 onChange={(event) => {
                   const value = event.target.value
@@ -334,22 +471,72 @@ function LoginForm({
                   setFormError(null)
                 }}
               />
-              <FieldError id={passwordErrorId} errors={fieldErrors.password} />
-            </Field>
-          )}
-        />
+              <Typography
+                as="button"
+                type="button"
+                className="absolute right-md top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors flex items-center justify-center cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <Typography
+                  as="span"
+                  className="material-symbols-outlined select-none"
+                >
+                  {showPassword ? 'visibility_off' : 'visibility'}
+                </Typography>
+              </Typography>
+            </div>
+            {hasErrors(fieldErrors.password) && (
+              <Typography
+                as="span"
+                variant="caption"
+                tone="destructive"
+                className="mt-xs block"
+              >
+                {fieldErrors.password?.[0]?.message}
+              </Typography>
+            )}
+          </div>
+        )}
+      />
 
-        <FormAlert message={formError} />
+      <div className="flex items-center justify-between mt-sm mb-sm">
+        <Typography
+          as="label"
+          variant="bodySm"
+          className="flex items-center gap-sm cursor-pointer group select-none text-on-surface-variant hover:text-on-surface transition-colors"
+        >
+          <input
+            type="checkbox"
+            className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary bg-surface transition-colors cursor-pointer"
+          />
+          Запам'ятати мене
+        </Typography>
+        <Typography
+          as="a"
+          variant="label"
+          className="text-primary hover:text-on-primary-fixed-variant transition-colors"
+          href="#"
+        >
+          Забули пароль?
+        </Typography>
+      </div>
 
-        <form.Subscribe
-          selector={(state) => state.isSubmitting}
-          children={(isSubmitting) => (
-            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Вхід...' : 'Увійти'}
-            </Button>
-          )}
-        />
-      </FieldGroup>
+      <FormAlert message={formError} />
+
+      <form.Subscribe
+        selector={(state) => state.isSubmitting}
+        children={(isSubmitting) => (
+          <Typography
+            as="button"
+            type="submit"
+            disabled={isSubmitting}
+            variant="h4"
+            className="w-full bg-primary text-on-primary py-[14px] rounded-lg shadow-sm hover:bg-on-primary-fixed-variant transition-colors cursor-pointer disabled:opacity-50"
+          >
+            {isSubmitting ? 'Вхід...' : 'Увійти'}
+          </Typography>
+        )}
+      />
     </form>
   )
 }
@@ -358,10 +545,27 @@ function FormAlert({ message }: { message: string | null }) {
   if (!message) return null
 
   return (
-    <Alert variant="destructive">
-      <AlertTitle>Помилка авторизації</AlertTitle>
-      <AlertDescription>{message}</AlertDescription>
-    </Alert>
+    <div className="bg-error-container text-on-error-container p-md rounded-lg border border-error/20 flex flex-col gap-xs">
+      <Typography
+        as="span"
+        variant="label"
+        className="uppercase text-error flex items-center gap-xs"
+      >
+        <Typography
+          as="span"
+          className="material-symbols-outlined"
+        >
+          error
+        </Typography>
+        Помилка авторизації
+      </Typography>
+      <Typography
+        as="p"
+        variant="bodySm"
+      >
+        {message}
+      </Typography>
+    </div>
   )
 }
 
@@ -389,10 +593,6 @@ function clearFieldError(
 
 function hasErrors(errors: FormError[] | undefined) {
   return Boolean(errors?.length)
-}
-
-function errorId(errors: FormError[] | undefined, id: string) {
-  return hasErrors(errors) ? id : undefined
 }
 
 function isFieldName(field: unknown): field is FieldName {

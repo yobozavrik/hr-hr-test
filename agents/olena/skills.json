@@ -1,0 +1,21 @@
+{
+  "agentId": "olena",
+  "skills": [
+    {
+      "name": "competitor_site_scraper",
+      "description": "Scrapes and normalizes career sites of targeted competitors, identifying newly posted opportunities."
+    },
+    {
+      "name": "tech_trend_analyzer",
+      "description": "Aggregates tech stack requirements across competitor vacancies to identify strategic shifts."
+    },
+    {
+      "name": "threat_index_calculator",
+      "description": "Quantifies recruitment competition intensity based on relative vacancy volumes and salary ranges."
+    },
+    {
+      "name": "poaching_alert_generator",
+      "description": "Monitors competitor activity for aggressive expansions that threaten active internal staff retention."
+    }
+  ]
+}
