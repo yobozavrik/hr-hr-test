@@ -24,6 +24,11 @@ Hono route -> Zod validation -> auth/session guard -> feature service -> Prisma 
 - `src/env.ts` validates environment variables with Zod.
 - `src/db.ts` creates the Prisma client.
 - `src/auth/*` owns the auth feature: routes, service logic, JWT helpers, password hashing, and refresh-token hashing.
+- `src/agents/*` implements the executable Multi-Agent orchestration framework:
+  - `base/` — defines standard agent interfaces (`IAgent`, `AgentContext`), status states, lifecycle stages, and registry search maps.
+  - `orchestrator/` — orchestrates intent parsing, routing to targeted domain workers, executing them in parallel, and aggregating result payloads.
+  - `shared/` — handles LLM API providers (Gemini, OpenAI) and key-value memory context stores.
+  - Individual domain folders (`sourcing/`, `matching/`, `screening/`, `analytics/`, `outreach/`, `reporting/`) hold concrete worker execution engines.
 
 Routes should stay thin. Do not put business logic into Hono handlers, UI clients, or child components when the decision belongs in a backend service.
 
