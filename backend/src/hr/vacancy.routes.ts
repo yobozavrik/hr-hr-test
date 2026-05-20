@@ -5,7 +5,9 @@ import { HRService } from './service'
 import { requireAuth } from '../auth/routes'
 import type { Variables } from '../app'
 
-export function createVacancyRoutes(db: any) {
+import type { DbClient } from '../db'
+
+export function createVacancyRoutes(db: DbClient) {
   const service = new HRService(db)
   const app = new Hono<{ Variables: Variables }>()
 

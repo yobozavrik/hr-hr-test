@@ -10,7 +10,9 @@ import { RobotaUaScraper } from '../integrations/robota-ua.service'
 import { LinkedInScraper } from '../integrations/linkedin.service'
 import { AIService } from '../integrations/ai.service'
 
-export function createSearchRoutes(db: any) {
+import type { DbClient } from '../db'
+
+export function createSearchRoutes(db: DbClient) {
   const app = new Hono<{ Variables: Variables }>()
 
   const workScraper = new WorkUaScraper()

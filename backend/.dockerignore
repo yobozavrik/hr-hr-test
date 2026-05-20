@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+bun.lockb
+.env
+.scratch
+dist
+build
+.git
+.github
+*.log
+*.tmp
+*.local

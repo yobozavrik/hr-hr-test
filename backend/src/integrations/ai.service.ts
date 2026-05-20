@@ -2,7 +2,9 @@ import {
   ARTUR_ASSESSMENT_PROMPT,
   SOFIA_OUTREACH_PROMPT,
   DANILO_ANALYTICS_PROMPT,
-  MARTA_SOURCING_PROMPT
+  MARTA_SOURCING_PROMPT,
+  MAKSYM_SALARY_TRACKER_PROMPT,
+  OLENA_COMPETITOR_TRACKER_PROMPT
 } from './prompts'
 
 export interface AIAnalysisResult {
@@ -33,6 +35,24 @@ export interface AIMartaSourcingResult {
   expansions: string[]
   titles: string[]
   booleanSearch: string
+}
+
+export interface AIMaksymSalaryTrackResult {
+  position: string
+  budget: number
+  marketMedian: number
+  comparison: 'above_market' | 'within_market' | 'below_market'
+  alertTriggered: boolean
+  advice: string
+}
+
+export interface AIOlenaCompetitorTrackResult {
+  company: string
+  niche: string
+  activeVacancies: { title: string; dateOpened: string }[]
+  closedVacancies: { title: string; dateClosed: string }[]
+  alertLevel: 'high' | 'medium' | 'low'
+  report: string
 }
 
 export class AIService {
@@ -151,6 +171,62 @@ SEARCH TEXT: ${params.text}
       titles: [params.text, `${params.text} Developer`],
       booleanSearch: `"${params.text}" AND ("developer" OR "engineer")`
     }))
+  }
+
+  // Maksym - Salary Tracker
+  async trackSalary(params: {
+    position: string
+    budget: number
+  }): Promise<AIMaksymSalaryTrackResult> {
+    const prompt = `
+${MAKSYM_SALARY_TRACKER_PROMPT}
+
+VACANCY TO ANALYZE: ${params.position}
+OUR BUDGET: ${params.budget} USD
+`
+    return this.executeAIPrompt<AIMaksymSalaryTrackResult>(prompt, () => {
+      const marketMedian = params.position.toLowerCase().includes('senior') ? 4000 : params.position.toLowerCase().includes('junior') ? 1200 : 2500
+      const comparison = params.budget > marketMedian + 500 ? 'above_market' : params.budget < marketMedian - 500 ? 'below_market' : 'within_market'
+      const alertTriggered = comparison === 'below_market'
+      return {
+        position: params.position,
+        budget: params.budget,
+        marketMedian,
+        comparison,
+        alertTriggered,
+        advice: alertTriggered
+          ? `Увага! Бюджет $${params.budget} значно нижче ринкової медіани ($${marketMedian}). Рекомендується збільшити пропозицію або знизити вимоги до кандидатів.`
+          : `Бюджет $${params.budget} знаходиться в межах ринкової медіани ($${marketMedian}). Чудова пропозиція для швидкого найму.`
+      }
+    })
+  }
+
+  // Olena - Competitor Tracker
+  async trackCompetitors(params: {
+    company: string
+    niche: string
+  }): Promise<AIOlenaCompetitorTrackResult> {
+    const prompt = `
+${OLENA_COMPETITOR_TRACKER_PROMPT}
+
+COMPETITOR COMPANY: ${params.company}
+TARGET NICHE: ${params.niche}
+`
+    return this.executeAIPrompt<AIOlenaCompetitorTrackResult>(prompt, () => {
+      return {
+        company: params.company,
+        niche: params.niche,
+        activeVacancies: [
+          { title: `${params.niche} Developer`, dateOpened: '2026-05-18' },
+          { title: `Senior QA Engineer (${params.niche})`, dateOpened: '2026-05-15' }
+        ],
+        closedVacancies: [
+          { title: `Product Manager`, dateClosed: '2026-05-10' }
+        ],
+        alertLevel: 'medium',
+        report: `Компанія ${params.company} активно розширює присутність у сфері ${params.niche}. Останнім часом відкрито 2 нові вакансії інженерів та закрито вакансію PM, що вказує на перехід до фази активної реалізації продуктів.`
+      }
+    })
   }
 
   private async callOpenAI<T>(prompt: string): Promise<T> {

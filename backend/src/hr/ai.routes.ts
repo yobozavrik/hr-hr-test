@@ -66,5 +66,39 @@ export function createAIRoutes() {
     }
   )
 
+  // Maksym Salary Tracker
+  app.post(
+    '/salary-track',
+    zValidator(
+      'json',
+      z.object({
+        position: z.string().min(1),
+        budget: z.number().positive()
+      })
+    ),
+    async (c) => {
+      const { position, budget } = c.req.valid('json')
+      const result = await aiService.trackSalary({ position, budget })
+      return c.json(result)
+    }
+  )
+
+  // Olena Competitor Tracker
+  app.post(
+    '/competitors',
+    zValidator(
+      'json',
+      z.object({
+        company: z.string().min(1),
+        niche: z.string().min(1)
+      })
+    ),
+    async (c) => {
+      const { company, niche } = c.req.valid('json')
+      const result = await aiService.trackCompetitors({ company, niche })
+      return c.json(result)
+    }
+  )
+
   return app
 }

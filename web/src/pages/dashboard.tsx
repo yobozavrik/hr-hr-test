@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useAuth } from '@/lib/use-auth'
 import { useDailyDigest, useVacancies, useResumes, useUpcomingTasks, useMatches, useHrClient } from '@/hooks/use-hr'
 import { Badge } from '@/components/ui/badge'
@@ -10,6 +10,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface AIEmployee {
   id: string
@@ -37,6 +38,36 @@ export function DashboardPage() {
   const [taskParam2, setTaskParam2] = useState('')
   const [loadingSimulation, setLoadingSimulation] = useState(false)
   const [simulationResult, setSimulationResult] = useState<any>(null)
+
+  // Dynamics (last 7 days trend of added Resumes and created Matches)
+  const dynamicsData = useMemo(() => {
+    if (!resumes.data || !matches.data) return []
+    const datesMap: Record<string, { date: string; 'Нові резюме': number; 'Нові матчі': number }> = {}
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      const dateStr = d.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })
+      datesMap[dateStr] = { date: dateStr, 'Нові резюме': 0, 'Нові матчі': 0 }
+    }
+    resumes.data.forEach((r: any) => {
+      const dateStr = new Date(r.createdAt).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })
+      if (dateStr in datesMap) {
+        datesMap[dateStr]['Нові резюме']++
+      }
+    })
+    matches.data.forEach((m: any) => {
+      const dateStr = new Date(m.createdAt).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })
+      if (dateStr in datesMap) {
+        datesMap[dateStr]['Нові матчі']++
+      }
+    })
+    return Object.values(datesMap)
+  }, [resumes.data, matches.data])
+
+  const avgMatchScore = useMemo(() => {
+    if (!matches.data || matches.data.length === 0) return 0
+    return Math.round(matches.data.reduce((sum: number, m: any) => sum + m.score, 0) / matches.data.length)
+  }, [matches.data])
 
   const isLoading = digest.isLoading || vacancies.isLoading || resumes.isLoading
 
@@ -111,6 +142,35 @@ export function DashboardPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       )
+    },
+    {
+      id: 'maksym',
+      name: 'Максим',
+      role: 'ІІ-Монітор Зарплат (Salary Monitor)',
+      description: 'Відстеження змін зарплатних вилок по вакансіях, порівняння з бюджетом компанії та сповіщення про відхилення.',
+      status: 'Вільний: Готовий порівняти вакансії з ринком',
+      statusType: 'idle',
+      gradient: 'from-cyan-600 to-blue-600',
+      icon: (
+        <svg className="size-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
+    {
+      id: 'olena',
+      name: 'Олена',
+      role: 'ІІ-Розвідник Конкурентів (Competitor Specialist)',
+      description: 'Моніторинг вакансій компаній-конкурентів, сигналізація про відкриття та закриття вакансій.',
+      status: 'Вільна: Готова проаналізувати активність конкурентів',
+      statusType: 'idle',
+      gradient: 'from-rose-600 to-red-600',
+      icon: (
+        <svg className="size-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      )
     }
   ]
 
@@ -160,6 +220,24 @@ export function DashboardPage() {
         })
         setSimulationResult({
           type: 'assessment',
+          ...res
+        })
+      } else if (selectedAgent.id === 'maksym') {
+        const res = await client.aiTrackSalary({
+          position: taskParam1 || 'React Developer',
+          budget: Number(taskParam2) || 2500
+        })
+        setSimulationResult({
+          type: 'salary-track',
+          ...res
+        })
+      } else if (selectedAgent.id === 'olena') {
+        const res = await client.aiTrackCompetitors({
+          company: taskParam1 || 'SoftServe',
+          niche: taskParam2 || 'FinTech'
+        })
+        setSimulationResult({
+          type: 'competitor-track',
           ...res
         })
       }
@@ -213,6 +291,39 @@ export function DashboardPage() {
           titles: [`${taskParam1 || 'React'} Developer`, `Software Engineer ${taskParam1 || 'React'}`],
           booleanSearch: `"${taskParam1 || 'React'}" AND ("developer" OR "engineer")`
         })
+      } else if (selectedAgent.id === 'maksym') {
+        const budget = Number(taskParam2) || 2500
+        const marketMedian = taskParam1.toLowerCase().includes('senior') ? 4000 : taskParam1.toLowerCase().includes('junior') ? 1200 : 2500
+        const comparison = budget > marketMedian + 500 ? 'above_market' : budget < marketMedian - 500 ? 'below_market' : 'within_market'
+        const alertTriggered = comparison === 'below_market'
+        setSimulationResult({
+          type: 'salary-track',
+          position: taskParam1 || 'React Developer',
+          budget,
+          marketMedian,
+          comparison,
+          alertTriggered,
+          advice: alertTriggered
+            ? `Увага! Бюджет $${budget} значно нижче ринкової медіани ($${marketMedian}). Рекомендується збільшити пропозицію або знизити вимоги до кандидатів.`
+            : `Бюджет $${budget} знаходиться в межах ринкової медіани ($${marketMedian}). Чудова пропозиція для швидкого найму.`
+        })
+      } else if (selectedAgent.id === 'olena') {
+        const company = taskParam1 || 'SoftServe'
+        const niche = taskParam2 || 'FinTech'
+        setSimulationResult({
+          type: 'competitor-track',
+          company,
+          niche,
+          activeVacancies: [
+            { title: `${niche} Developer`, dateOpened: '2026-05-18' },
+            { title: `Senior QA Engineer (${niche})`, dateOpened: '2026-05-15' }
+          ],
+          closedVacancies: [
+            { title: `Product Manager`, dateClosed: '2026-05-10' }
+          ],
+          alertLevel: 'medium',
+          report: `Компанія ${company} активно розширює присутність у сфері ${niche}. Останнім часом відкрито 2 нові вакансії інженерів та закрито вакансію PM, що вказує на перехід до фази активної реалізації продуктів.`
+        })
       }
     } finally {
       setLoadingSimulation(false)
@@ -246,36 +357,93 @@ export function DashboardPage() {
         ))}
       </div>
 
-      {/* Daily Digest */}
-      {digest.data && (
-        <Card>
-          <CardHeader>
+      {/* Daily Digest & Mini Analytics */}
+      <div className="grid gap-6 lg:grid-cols-12">
+        {/* Daily Digest */}
+        {digest.data && (
+          <Card className="lg:col-span-4 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-semibold">Щоденне зведення</CardTitle>
+                  <CardDescription className="text-xs">Нове за останні 24 години</CardDescription>
+                </div>
+                <Badge variant="secondary" className="text-[10px]">{new Date(digest.data.date).toLocaleDateString('uk-UA')}</Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3 flex-1 flex flex-col justify-center">
+              <div className="flex items-center justify-between rounded-lg bg-muted/40 p-3 border border-white/5">
+                <span className="text-xs text-muted-foreground">Нових вакансій</span>
+                <span className="text-lg font-bold text-blue-400">{digest.data.newVacancies}</span>
+              </div>
+              <div className="flex items-center justify-between rounded-lg bg-muted/40 p-3 border border-white/5">
+                <span className="text-xs text-muted-foreground">Нових резюме</span>
+                <span className="text-lg font-bold text-emerald-400">{digest.data.newResumes}</span>
+              </div>
+              <div className="flex items-center justify-between rounded-lg bg-muted/40 p-3 border border-white/5">
+                <span className="text-xs text-muted-foreground">Нових матчів</span>
+                <span className="text-lg font-bold text-purple-400">{digest.data.newMatches}</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Mini Analytics widget */}
+        <Card className="lg:col-span-8 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Щоденне зведення</CardTitle>
-                <CardDescription>Нове за останні 24 години</CardDescription>
+                <CardTitle className="text-base font-semibold">Активність рекрутингу</CardTitle>
+                <CardDescription className="text-xs">Динаміка завантаження резюме та матчів</CardDescription>
               </div>
-              <Badge variant="secondary">{new Date(digest.data.date).toLocaleDateString('uk-UA')}</Badge>
+              <Button asChild size="sm" variant="outline" className="text-xs h-8">
+                <Link to="/app/analytics">Аналітична панель</Link>
+              </Button>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="flex flex-col items-center gap-1 rounded-lg bg-muted p-4">
-                <span className="text-2xl font-bold">{digest.data.newVacancies}</span>
-                <span className="text-sm text-muted-foreground">Нових вакансій</span>
+          <CardContent className="grid sm:grid-cols-3 gap-6 flex-1 items-center py-3">
+            {/* Charts representation */}
+            <div className="sm:col-span-2 h-36">
+              {dynamicsData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={dynamicsData}
+                    margin={{ top: 5, right: 10, left: -25, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="miniResumes" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="date" stroke="rgba(255,255,255,0.4)" fontSize={9} />
+                    <YAxis stroke="rgba(255,255,255,0.4)" fontSize={9} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '6px', fontSize: '10px' }}
+                    />
+                    <Area type="monotone" dataKey="Нові резюме" stroke="#10b981" fillOpacity={1} fill="url(#miniResumes)" strokeWidth={1.5} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <span className="text-xs text-muted-foreground">Немає даних</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Avg Match score card */}
+            <div className="flex flex-col items-center justify-center p-4 bg-muted/40 rounded-xl border border-white/5 text-center h-full">
+              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Середній Match Score</span>
+              <span className="text-4xl font-extrabold text-teal-400 mb-1">{avgMatchScore}%</span>
+              <div className="w-full bg-white/10 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                <div className="bg-teal-400 h-1.5 rounded-full" style={{ width: `${avgMatchScore}%` }} />
               </div>
-              <div className="flex flex-col items-center gap-1 rounded-lg bg-muted p-4">
-                <span className="text-2xl font-bold">{digest.data.newResumes}</span>
-                <span className="text-sm text-muted-foreground">Нових резюме</span>
-              </div>
-              <div className="flex flex-col items-center gap-1 rounded-lg bg-muted p-4">
-                <span className="text-2xl font-bold">{digest.data.newMatches}</span>
-                <span className="text-sm text-muted-foreground">Нових матчів</span>
-              </div>
+              <span className="text-[9px] text-muted-foreground mt-2">Якість підбору</span>
             </div>
           </CardContent>
         </Card>
-      )}
+      </div>
 
       {/* Grid containing Tasks (Left) and AI Team (Right) */}
       <div className="grid gap-6 lg:grid-cols-12">
@@ -474,6 +642,59 @@ export function DashboardPage() {
                 </div>
               )}
 
+              {selectedAgent.id === 'maksym' && (
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="trackSalaryPosition">Посада для моніторингу</Label>
+                    <Input
+                      id="trackSalaryPosition"
+                      placeholder="React Developer"
+                      value={taskParam1}
+                      onChange={(e) => setTaskParam1(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="trackSalaryBudget">Бюджет компанії (USD)</Label>
+                    <Input
+                      id="trackSalaryBudget"
+                      type="number"
+                      placeholder="2500"
+                      value={taskParam2}
+                      onChange={(e) => setTaskParam2(e.target.value)}
+                    />
+                  </div>
+                  <Typography variant="bodySm" tone="muted">
+                    Максим порівняє бюджет вакансії з актуальними ринковими даними та надішле попередження у разі суттєвого відхилення.
+                  </Typography>
+                </div>
+              )}
+
+              {selectedAgent.id === 'olena' && (
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="competitorCompany">Компанія-конкурент</Label>
+                    <Input
+                      id="competitorCompany"
+                      placeholder="SoftServe"
+                      value={taskParam1}
+                      onChange={(e) => setTaskParam1(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="competitorNiche">Ніша або напрямок</Label>
+                    <Input
+                      id="competitorNiche"
+                      placeholder="FinTech"
+                      value={taskParam2}
+                      onChange={(e) => setTaskParam2(e.target.value)}
+                    />
+                  </div>
+                  <Typography variant="bodySm" tone="muted">
+                    Олена здійснить розвідку відкритих вакансій конкурента у вказаній ніші та сформує аналітичний звіт.
+                  </Typography>
+                </div>
+              )}
+
               {/* Progress animation loader */}
               {loadingSimulation && (
                 <div className="flex flex-col items-center justify-center py-6 gap-2">
@@ -609,6 +830,64 @@ export function DashboardPage() {
                       }} className="w-full mt-2" size="sm">
                         Перейти до результатів пошуку
                       </Button>
+                    </div>
+                  )}
+
+                  {simulationResult.type === 'salary-track' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b pb-1.5 font-semibold text-sm">
+                        <span className="text-foreground">Аналітика бюджету: {simulationResult.position}</span>
+                        <Badge variant={simulationResult.alertTriggered ? 'destructive' : 'outline'} className={!simulationResult.alertTriggered ? 'bg-emerald-500/10 text-emerald-400' : ''}>
+                          {simulationResult.comparison === 'above_market' ? 'Вище ринку' : simulationResult.comparison === 'within_market' ? 'В межах ринку' : 'Нижче ринку'}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-center">
+                        <div className="bg-muted p-2 rounded border">
+                          <span className="block text-[10px] text-muted-foreground uppercase font-semibold">Наш бюджет</span>
+                          <span className="text-sm font-bold text-foreground">${simulationResult.budget}</span>
+                        </div>
+                        <div className="bg-muted p-2 rounded border">
+                          <span className="block text-[10px] text-muted-foreground uppercase font-semibold">Медіана ринку</span>
+                          <span className="text-sm font-bold text-foreground">${simulationResult.marketMedian}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[11px] text-muted-foreground italic leading-relaxed pt-1.5 border-t border-white/5">
+                          {simulationResult.advice}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {simulationResult.type === 'competitor-track' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b pb-1.5 font-semibold text-sm">
+                        <span className="text-foreground">Розвідка конкурента: {simulationResult.company}</span>
+                        <Badge variant={simulationResult.alertLevel === 'high' ? 'destructive' : simulationResult.alertLevel === 'medium' ? 'default' : 'secondary'}>
+                          Загроза: {simulationResult.alertLevel === 'high' ? 'Висока' : simulationResult.alertLevel === 'medium' ? 'Середня' : 'Низька'}
+                        </Badge>
+                      </div>
+                      <div className="space-y-2 text-left text-xs">
+                        <div>
+                          <span className="font-semibold text-card-foreground">Активні вакансії ({simulationResult.niche}):</span>
+                          <ul className="list-disc pl-4 mt-1 space-y-1 text-muted-foreground">
+                            {simulationResult.activeVacancies?.map((v: any, i: number) => (
+                              <li key={i}>{v.title} <span className="text-[10px] text-muted-foreground/70">(відкрита: {v.dateOpened})</span></li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-card-foreground">Закриті вакансії:</span>
+                          <ul className="list-disc pl-4 mt-1 space-y-1 text-muted-foreground">
+                            {simulationResult.closedVacancies?.map((v: any, i: number) => (
+                              <li key={i}>{v.title} <span className="text-[10px] text-muted-foreground/70">(закрита: {v.dateClosed})</span></li>
+                            ))}
+                          </ul>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground italic leading-relaxed pt-1.5 border-t border-white/5">
+                          {simulationResult.report}
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>

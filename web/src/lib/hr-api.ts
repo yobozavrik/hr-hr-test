@@ -181,5 +181,13 @@ export class HrApiClient {
   aiExpandSearch(data: { text: string }) {
     return this.request('/api/hr/ai/expand', { method: 'POST', body: data })
   }
+
+  aiTrackSalary(data: { position: string; budget: number }) {
+    return this.request('/api/hr/ai/salary-track', { method: 'POST', body: data })
+  }
+
+  aiTrackCompetitors(data: { company: string; niche: string }) {
+    return this.request('/api/hr/ai/competitors', { method: 'POST', body: data })
+  }
 }
 

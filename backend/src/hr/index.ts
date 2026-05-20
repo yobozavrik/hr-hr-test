@@ -9,7 +9,9 @@ import { createDigestRoutes } from './digest.routes'
 import { createSearchRoutes } from './search.routes'
 import { createAIRoutes } from './ai.routes'
 
-export function createHRRoutes(db: any) {
+import type { DbClient } from '../db'
+
+export function createHRRoutes(db: DbClient) {
   const app = new Hono()
 
   app.route('/vacancies', createVacancyRoutes(db))
