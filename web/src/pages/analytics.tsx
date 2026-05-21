@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { Vacancy, Resume, Match, SalaryReport } from '@hr-recruiter/contracts'
+import type { SalaryReport } from '@hr-recruiter/contracts'
 import {
   BarChart,
   Bar,
@@ -56,13 +56,13 @@ export function AnalyticsPage() {
 
   const totals = useMemo(() => {
     const totalVacancies = vacancies.data?.length ?? 0
-    const activeVacancies = vacancies.data?.filter((v: Vacancy) => v.status === 'active').length ?? 0
+    const activeVacancies = vacancies.data?.filter((v) => v.status === 'active').length ?? 0
     const totalResumes = resumes.data?.length ?? 0
     const totalMatches = matches.data?.length ?? 0
     const avgMatchScore = totalMatches
-      ? Math.round(matches.data!.reduce((sum: number, m: Match) => sum + m.score, 0) / totalMatches)
+      ? Math.round(matches.data!.reduce((sum: number, m) => sum + m.score, 0) / totalMatches)
       : 0
-    const hiredCount = resumes.data?.filter((r: Resume) => r.status === 'hired').length ?? 0
+    const hiredCount = resumes.data?.filter((r) => r.status === 'hired').length ?? 0
     const conversionRate = totalResumes ? Math.round((hiredCount / totalResumes) * 100) : 0
 
     return { totalVacancies, activeVacancies, totalResumes, avgMatchScore, hiredCount, conversionRate }
@@ -77,11 +77,11 @@ export function AnalyticsPage() {
       const dateStr = d.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })
       datesMap[dateStr] = { date: dateStr, 'Нові резюме': 0, 'Нові матчі': 0 }
     }
-    resumes.data.forEach((r: Resume) => {
+    resumes.data.forEach((r) => {
       const dateStr = new Date(r.createdAt).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })
       if (dateStr in datesMap) datesMap[dateStr]['Нові резюме']++
     })
-    matches.data.forEach((m: Match) => {
+    matches.data.forEach((m) => {
       const dateStr = new Date(m.createdAt).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })
       if (dateStr in datesMap) datesMap[dateStr]['Нові матчі']++
     })
@@ -91,7 +91,7 @@ export function AnalyticsPage() {
   const funnelData = useMemo(() => {
     if (!resumes.data) return []
     const counts = { new: 0, contact: 0, interview: 0, offer: 0, hired: 0, rejected: 0 }
-    resumes.data.forEach((r: Resume) => {
+    resumes.data.forEach((r) => {
       if (r.status in counts) counts[r.status as keyof typeof counts]++
     })
     return [
@@ -107,7 +107,7 @@ export function AnalyticsPage() {
   const skillsData = useMemo(() => {
     if (!resumes.data) return []
     const countMap: Record<string, number> = {}
-    resumes.data.forEach((r: Resume) => {
+    resumes.data.forEach((r) => {
       if (Array.isArray(r.skills)) {
         r.skills.forEach((s: string) => {
           const cleaned = s.trim()
@@ -124,7 +124,7 @@ export function AnalyticsPage() {
   const matchBrackets = useMemo(() => {
     if (!matches.data) return []
     let high = 0, medium = 0, low = 0
-    matches.data.forEach((m: Match) => {
+    matches.data.forEach((m) => {
       if (m.score >= 80) high++
       else if (m.score >= 60) medium++
       else low++
@@ -139,19 +139,19 @@ export function AnalyticsPage() {
   const salaryComparisonData = useMemo(() => {
     if (!resumes.data || !vacancies.data) return []
     const positionsSet = new Set<string>()
-    resumes.data.forEach((r: Resume) => { if (r.position) positionsSet.add(r.position.trim()) })
-    vacancies.data.forEach((v: Vacancy) => { if (v.title) positionsSet.add(v.title.trim()) })
+    resumes.data.forEach((r) => { if (r.position) positionsSet.add(r.position.trim()) })
+    vacancies.data.forEach((v) => { if (v.title) positionsSet.add(v.title.trim()) })
     const topPositions = Array.from(positionsSet).slice(0, 5)
     return topPositions.map(pos => {
       const candidateSalaries = resumes.data
-        ?.filter((r: Resume) => r.position?.trim().toLowerCase() === pos.toLowerCase() && r.salary)
-        .map((r: Resume) => r.salary as number) || []
+        ?.filter((r) => r.position?.trim().toLowerCase() === pos.toLowerCase() && r.salary)
+        .map((r) => r.salary as number) || []
       const avgCandidate = candidateSalaries.length
         ? Math.round(candidateSalaries.reduce((sum: number, val: number) => sum + val, 0) / candidateSalaries.length)
         : 0
       const vacancyBudgets = vacancies.data
-        ?.filter((v: Vacancy) => v.title?.trim().toLowerCase() === pos.toLowerCase() && (v.salaryFrom || v.salaryTo))
-        .map((v: Vacancy) => {
+        ?.filter((v) => v.title?.trim().toLowerCase() === pos.toLowerCase() && (v.salaryFrom || v.salaryTo))
+        .map((v) => {
           if (v.salaryFrom && v.salaryTo) return (v.salaryFrom + v.salaryTo) / 2
           return v.salaryFrom || v.salaryTo || 0
         }) || []
@@ -169,7 +169,7 @@ export function AnalyticsPage() {
   const handleExportCSV = () => {
     if (!matches.data || matches.data.length === 0) return
     const headers = ['Кандидат', 'Email', 'Телефон', 'Посада', 'Зарплатні очікування', 'Навички', 'Статус кандидата', 'Вакансія', 'Бюджет вакансії (від-до)', 'Рівень відповідності (Score)', 'Статус матчу', 'Дата створення']
-    const rows = matches.data.map((m: Match) => {
+    const rows = matches.data.map((m) => {
       const resume = m.resume
       const vacancy = m.vacancy
       return [
@@ -199,17 +199,17 @@ export function AnalyticsPage() {
     if (!selectedVacancyId) return
     setGeneratingReport(true)
     setTimeout(() => {
-      const vacancy = vacancies.data?.find((v: Vacancy) => v.id === selectedVacancyId)
+      const vacancy = vacancies.data?.find((v) => v.id === selectedVacancyId)
       if (!vacancy) return
-      const matched = matches.data?.filter((m: Match) => m.vacancyId === selectedVacancyId) || []
+      const matched = matches.data?.filter((m) => m.vacancyId === selectedVacancyId) || []
       const sortedMatched = [...matched].sort((a, b) => b.score - a.score)
-      const avgScore = matched.length ? Math.round(matched.reduce((sum: number, m: Match) => sum + m.score, 0) / matched.length) : 0
+      const avgScore = matched.length ? Math.round(matched.reduce((sum: number, m) => sum + m.score, 0) / matched.length) : 0
       const counts = { new: 0, contact: 0, interview: 0, offer: 0, hired: 0, rejected: 0 }
-      matched.forEach((m: Match) => {
+      matched.forEach((m) => {
         const status = m.resume?.status
         if (status && status in counts) counts[status as keyof typeof counts]++
       })
-      const candidateSalaries = matched.map((m: Match) => m.resume?.salary).filter(Boolean) as number[]
+      const candidateSalaries = matched.map((m) => m.resume?.salary).filter(Boolean) as number[]
       const avgCandidateSalary = candidateSalaries.length ? Math.round(candidateSalaries.reduce((a: number, b: number) => a + b, 0) / candidateSalaries.length) : 0
       const vacancyAvgBudget = (vacancy.salaryFrom && vacancy.salaryTo) ? (vacancy.salaryFrom + vacancy.salaryTo) / 2 : vacancy.salaryFrom || vacancy.salaryTo || 0
       const insights: string[] = []
@@ -478,7 +478,7 @@ export function AnalyticsPage() {
                   <Select value={selectedVacancyId} onValueChange={setSelectedVacancyId}>
                     <SelectTrigger><SelectValue placeholder="-- Оберіть вакансію зі списку --" /></SelectTrigger>
                     <SelectContent>
-                      {vacancies.data?.map((v: Vacancy) => (
+                      {vacancies.data?.map((v) => (
                         <SelectItem key={v.id} value={v.id}>{v.title} ({v.company})</SelectItem>
                       ))}
                     </SelectContent>
@@ -564,7 +564,7 @@ export function AnalyticsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {generatedReport.topCandidates.map((m: Match, idx: number) => (
+                        {generatedReport.topCandidates.map((m: { score: number; resume?: { fullName?: string; position?: string; salary?: number | null; status?: string } }, idx: number) => (
                           <tr key={idx} className="border-b hover:bg-muted/50">
                             <td className="py-2.5 px-3 font-medium">{m.resume?.fullName}</td>
                             <td className="py-2.5 px-3 text-muted-foreground">{m.resume?.position}</td>

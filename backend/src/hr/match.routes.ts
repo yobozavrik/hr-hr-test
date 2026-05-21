@@ -26,8 +26,9 @@ export function createMatchRoutes(db: DbClient) {
     try {
       const match = await service.createMatch(user.id, data)
       return c.json(match, 201)
-    } catch (error: any) {
-      return c.json({ error: error.message }, 400)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create match'
+      return c.json({ error: message }, 400)
     }
   })
 
@@ -39,8 +40,9 @@ export function createMatchRoutes(db: DbClient) {
     try {
       const match = await service.updateMatch(user.id, id, status)
       return c.json(match)
-    } catch (error: any) {
-      return c.json({ error: error.message }, 400)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update match'
+      return c.json({ error: message }, 400)
     }
   })
 

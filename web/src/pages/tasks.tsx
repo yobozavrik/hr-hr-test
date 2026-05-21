@@ -15,6 +15,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
+interface Task {
+  id: string
+  title: string
+  description?: string | null
+  eventType: 'interview' | 'call' | 'meeting'
+  scheduledAt: string
+  status?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
 const typeConfig: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode; dotColor: string }> = {
   interview: {
     label: 'Співбесіда',
@@ -39,7 +50,7 @@ const typeConfig: Record<string, { label: string; color: string; bg: string; ico
   },
 }
 
-function CalendarView({ tasks }: { tasks: any[] }) {
+function CalendarView({ tasks }: { tasks: Task[] }) {
   const [currentDate, setCurrentDate] = useState(new Date())
 
   const year = currentDate.getFullYear()
@@ -51,7 +62,7 @@ function CalendarView({ tasks }: { tasks: any[] }) {
   const monthName = currentDate.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' })
 
   const tasksByDate = useMemo(() => {
-    const map: Record<string, any[]> = {}
+    const map: Record<string, Task[]> = {}
     tasks.forEach(t => {
       const d = new Date(t.scheduledAt)
       const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
@@ -134,12 +145,12 @@ export function TasksPage() {
 
   const filteredTasks = useMemo(() => {
     if (!data) return []
-    return typeFilter === 'all' ? data : data.filter((t: any) => t.eventType === typeFilter)
+    return typeFilter === 'all' ? data : data.filter((t) => t.eventType === typeFilter)
   }, [data, typeFilter])
 
   const groupedTasks = useMemo(() => {
     if (!data) return {}
-    const filtered = typeFilter === 'all' ? data : data.filter((t: any) => t.eventType === typeFilter)
+    const filtered = typeFilter === 'all' ? data : data.filter((t) => t.eventType === typeFilter)
     const sorted = [...filtered].sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
 
     const groups: Record<string, typeof sorted> = {}
@@ -166,14 +177,14 @@ export function TasksPage() {
   }, [data, typeFilter])
 
   const boardTasks = useMemo(() => {
-    if (!data) return { todo: [], inProgress: [], done: [], overdue: [] }
-    const filtered = typeFilter === 'all' ? data : data.filter((t: any) => t.eventType === typeFilter)
+    if (!data) return { todo: [] as Task[], inProgress: [] as Task[], done: [] as Task[], overdue: [] as Task[] }
+    const filtered = typeFilter === 'all' ? data : data.filter((t) => t.eventType === typeFilter)
     const now = new Date()
     return {
-      todo: filtered.filter((t: any) => new Date(t.scheduledAt) > now),
+      todo: filtered.filter((t) => new Date(t.scheduledAt) > now),
       inProgress: [],
       done: [],
-      overdue: filtered.filter((t: any) => new Date(t.scheduledAt) < now),
+      overdue: filtered.filter((t) => new Date(t.scheduledAt) < now),
     }
   }, [data, typeFilter])
 
@@ -211,7 +222,7 @@ export function TasksPage() {
 
   const totalTasks = data?.length ?? 0
 
-  const TaskCard = ({ task }: { task: any }) => {
+  const TaskCard = ({ task }: { task: Task }) => {
     const config = typeConfig[task.eventType] || typeConfig.meeting
     return (
       <Card className="hover:shadow-sm transition-shadow">
@@ -375,7 +386,7 @@ export function TasksPage() {
                 </div>
                 <div className="space-y-2 flex-1">
                   {boardTasks[col.key].length > 0 ? (
-                    boardTasks[col.key].map((task: any) => {
+                    boardTasks[col.key].map((task) => {
                       const config = typeConfig[task.eventType] || typeConfig.meeting
                       return (
                         <Card key={task.id} className="cursor-pointer hover:shadow-sm transition-shadow">

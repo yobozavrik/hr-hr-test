@@ -207,9 +207,9 @@ export function DashboardPage() {
             {matches.data && matches.data.length > 0 ? (
               <div className="space-y-3">
                 {matches.data
-                  .sort((a: { score: number }, b: { score: number }) => b.score - a.score)
+                  .sort((a, b) => b.score - a.score)
                   .slice(0, 5)
-                  .map((match: { id: string; score: number; vacancy?: { title: string }; resume?: { fullName: string; position: string } }) => (
+                  .map((match) => (
                     <div key={match.id} className="flex items-center justify-between rounded-lg border p-3">
                       <div className="flex items-center gap-3">
                         <div className={cn(

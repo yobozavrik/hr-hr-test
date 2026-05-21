@@ -10,6 +10,86 @@ import type {
   CreateSalaryReportRequest,
 } from '@hr-recruiter/contracts'
 
+export interface VacancyRecord {
+  id: string
+  userId: string
+  title: string
+  company: string
+  location: string | null
+  salaryFrom: number | null
+  salaryTo: number | null
+  currency: string
+  description: string
+  source: string
+  sourceUrl: string | null
+  status: 'active' | 'closed' | 'archived'
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ResumeRecord {
+  id: string
+  userId: string
+  fullName: string
+  email: string | null
+  phone: string | null
+  position: string
+  salary: number | null
+  currency: string
+  skills: string[]
+  experience: string | null
+  education: string | null
+  source: string | null
+  sourceUrl: string | null
+  status: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface MatchRecord {
+  id: string
+  vacancyId: string
+  resumeId: string
+  score: number
+  status: 'pending' | 'approved' | 'rejected'
+  createdAt: string
+  updatedAt: string
+  vacancy: VacancyRecord | null
+  resume: ResumeRecord | null
+}
+
+export interface TaskRecord {
+  id: string
+  userId: string
+  title: string
+  description: string | null
+  eventType: 'interview' | 'call' | 'meeting'
+  scheduledAt: string
+  status: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AgentTaskRecord {
+  id: string
+  agentId: string
+  taskTitle: string
+  status: string
+  inputParams: string | null
+  outputResult: string | null
+  durationMs: number | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AgentStatRecord {
+  agentId: string
+  totalTasks: number
+  completedTasks: number
+  failedTasks: number
+  avgDurationMs: number
+}
+
 const apiBaseUrl = (import.meta.env?.VITE_API_URL ?? 'http://localhost:3000').replace(/\/$/, '')
 
 export class HrApiClient {
@@ -47,78 +127,78 @@ export class HrApiClient {
   }
 
   // Vacancies
-  getVacancies() {
+  getVacancies(): Promise<VacancyRecord[]> {
     return this.request('/api/hr/vacancies')
   }
 
-  getVacancy(id: string) {
+  getVacancy(id: string): Promise<VacancyRecord> {
     return this.request(`/api/hr/vacancies/${id}`)
   }
 
-  createVacancy(data: CreateVacancyRequest) {
+  createVacancy(data: CreateVacancyRequest): Promise<VacancyRecord> {
     return this.request('/api/hr/vacancies', { method: 'POST', body: data })
   }
 
-  updateVacancy(id: string, data: UpdateVacancyRequest) {
+  updateVacancy(id: string, data: UpdateVacancyRequest): Promise<{ count: number }> {
     return this.request(`/api/hr/vacancies/${id}`, { method: 'PATCH', body: data })
   }
 
-  deleteVacancy(id: string) {
+  deleteVacancy(id: string): Promise<{ count: number }> {
     return this.request(`/api/hr/vacancies/${id}`, { method: 'DELETE' })
   }
 
   // Resumes
-  getResumes() {
+  getResumes(): Promise<ResumeRecord[]> {
     return this.request('/api/hr/resumes')
   }
 
-  getResume(id: string) {
+  getResume(id: string): Promise<ResumeRecord> {
     return this.request(`/api/hr/resumes/${id}`)
   }
 
-  createResume(data: CreateResumeRequest) {
+  createResume(data: CreateResumeRequest): Promise<ResumeRecord> {
     return this.request('/api/hr/resumes', { method: 'POST', body: data })
   }
 
-  updateResume(id: string, data: UpdateResumeRequest) {
+  updateResume(id: string, data: UpdateResumeRequest): Promise<{ count: number }> {
     return this.request(`/api/hr/resumes/${id}`, { method: 'PATCH', body: data })
   }
 
-  deleteResume(id: string) {
+  deleteResume(id: string): Promise<{ count: number }> {
     return this.request(`/api/hr/resumes/${id}`, { method: 'DELETE' })
   }
 
   // Matches
-  getMatches() {
+  getMatches(): Promise<MatchRecord[]> {
     return this.request('/api/hr/matches')
   }
 
-  createMatch(data: CreateMatchRequest) {
+  createMatch(data: CreateMatchRequest): Promise<MatchRecord> {
     return this.request('/api/hr/matches', { method: 'POST', body: data })
   }
 
-  updateMatch(id: string, status: string) {
+  updateMatch(id: string, status: string): Promise<MatchRecord> {
     return this.request(`/api/hr/matches/${id}`, { method: 'PATCH', body: { status } })
   }
 
   // Tasks
-  getTasks() {
+  getTasks(): Promise<TaskRecord[]> {
     return this.request('/api/hr/tasks')
   }
 
-  getUpcomingTasks() {
+  getUpcomingTasks(): Promise<TaskRecord[]> {
     return this.request('/api/hr/tasks/upcoming')
   }
 
-  createTask(data: CreateTaskRequest) {
+  createTask(data: CreateTaskRequest): Promise<TaskRecord> {
     return this.request('/api/hr/tasks', { method: 'POST', body: data })
   }
 
-  updateTask(id: string, data: UpdateTaskRequest) {
+  updateTask(id: string, data: UpdateTaskRequest): Promise<{ count: number }> {
     return this.request(`/api/hr/tasks/${id}`, { method: 'PATCH', body: data })
   }
 
-  deleteTask(id: string) {
+  deleteTask(id: string): Promise<{ count: number }> {
     return this.request(`/api/hr/tasks/${id}`, { method: 'DELETE' })
   }
 
@@ -193,20 +273,20 @@ export class HrApiClient {
   }
 
   // Agent Dashboard API
-  getAgentStats() {
+  getAgentStats(): Promise<AgentStatRecord[]> {
     return this.request('/api/hr/agents/stats')
   }
 
-  getAgentTasks(agentId?: string) {
+  getAgentTasks(agentId?: string): Promise<AgentTaskRecord[]> {
     const url = agentId ? `/api/hr/agents/tasks?agentId=${agentId}` : '/api/hr/agents/tasks'
     return this.request(url)
   }
 
-  createAgentTask(data: { agentId: string; taskTitle: string; inputParams?: string }) {
+  createAgentTask(data: { agentId: string; taskTitle: string; inputParams?: string }): Promise<AgentTaskRecord> {
     return this.request('/api/hr/agents/tasks', { method: 'POST', body: data })
   }
 
-  updateAgentTask(agentId: string, taskId: string, data: { status: string; outputResult?: string; durationMs?: number }) {
+  updateAgentTask(agentId: string, taskId: string, data: { status: string; outputResult?: string; durationMs?: number }): Promise<{ success: boolean }> {
     return this.request(`/api/hr/agents/tasks/${agentId}/${taskId}`, { method: 'PATCH', body: data })
   }
 

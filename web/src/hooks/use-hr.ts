@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/lib/use-auth'
 import { HrApiClient } from '@/lib/hr-api'
@@ -15,7 +16,7 @@ import type {
 
 export function useHrClient() {
   const auth = useAuth()
-  return new HrApiClient(() => auth.accessToken)
+  return useMemo(() => new HrApiClient(() => auth.accessToken, 'web'), [auth.accessToken])
 }
 
 // Vacancies

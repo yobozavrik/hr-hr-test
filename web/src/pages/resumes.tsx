@@ -52,11 +52,11 @@ export function ResumesPage() {
 
   const filteredData = useMemo(() => {
     if (!data) return []
-    return data.filter((r: any) => {
+    return data.filter((r) => {
       const matchesSearch = search === '' ||
         r.fullName.toLowerCase().includes(search.toLowerCase()) ||
         r.position.toLowerCase().includes(search.toLowerCase()) ||
-        r.skills?.some((s: string) => s.toLowerCase().includes(search.toLowerCase()))
+        r.skills?.some((s) => s.toLowerCase().includes(search.toLowerCase()))
       const matchesStatus = statusFilter === 'all' || r.status === statusFilter
       return matchesSearch && matchesStatus
     })
@@ -190,7 +190,7 @@ export function ResumesPage() {
       {/* Resume List */}
       <div className="space-y-3">
         {filteredData.length > 0 ? (
-          filteredData.map((resume: any, idx: number) => (
+          filteredData.map((resume, idx: number) => (
             <Card key={resume.id} className="hover:shadow-sm transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex items-start gap-4">

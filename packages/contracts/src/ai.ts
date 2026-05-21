@@ -38,3 +38,45 @@ export const aiTrackCompetitorsRequestSchema = z.object({
 })
 
 export type AiTrackCompetitorsRequest = z.infer<typeof aiTrackCompetitorsRequestSchema>
+
+// Agent Chat
+export const chatMessageSchema = z.object({
+  role: z.enum(['system', 'user', 'assistant']),
+  content: z.string(),
+})
+
+export const agentChatRequestSchema = z.object({
+  agentId: z.string(),
+  messages: z.array(chatMessageSchema),
+  vacancyId: z.string().optional(),
+  resumeId: z.string().optional(),
+})
+
+export type AgentChatRequest = z.infer<typeof agentChatRequestSchema>
+
+// Match Analysis
+export const matchAnalysisVacancySchema = z.object({
+  title: z.string(),
+  company: z.string().optional(),
+  location: z.string().optional(),
+  salaryFrom: z.number().optional(),
+  salaryTo: z.number().optional(),
+  description: z.string().optional(),
+  requirements: z.array(z.string()).optional(),
+})
+
+export const matchAnalysisResumeSchema = z.object({
+  fullName: z.string(),
+  position: z.string().optional(),
+  skills: z.array(z.string()).optional(),
+  experience: z.string().optional(),
+  education: z.string().optional(),
+  salary: z.string().optional(),
+})
+
+export const matchAnalysisRequestSchema = z.object({
+  vacancy: matchAnalysisVacancySchema,
+  resume: matchAnalysisResumeSchema,
+})
+
+export type MatchAnalysisRequest = z.infer<typeof matchAnalysisRequestSchema>

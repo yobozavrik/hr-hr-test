@@ -9,6 +9,7 @@ import { WorkUaScraper } from '../integrations/work-ua.service'
 import { RobotaUaScraper } from '../integrations/robota-ua.service'
 import { LinkedInScraper } from '../integrations/linkedin.service'
 import { AIService } from '../integrations/ai.service'
+import type { ScrapedItem } from '../integrations/scraper.interface'
 
 import type { DbClient } from '../db'
 
@@ -30,7 +31,7 @@ export function createSearchRoutes(db: DbClient) {
     console.log(`Starting multi-board search. Query: "${text}", Type: ${type}, Source: ${source}`)
 
     const searchParams = { text, page, location }
-    const promises: Promise<any[]>[] = []
+    const promises: Promise<ScrapedItem[]>[] = []
 
     // 1. Work.ua
     if (source === 'all' || source === 'work.ua') {
@@ -90,9 +91,10 @@ export function createSearchRoutes(db: DbClient) {
       })
 
       return c.json(analysis)
-    } catch (e: any) {
+    } catch (e) {
       console.error('Match analysis failed:', e)
-      return c.json({ error: e.message || 'Analysis failed' }, 500)
+      const message = e instanceof Error ? e.message : 'Analysis failed'
+      return c.json({ error: message }, 500)
     }
   })
 

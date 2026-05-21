@@ -24,7 +24,7 @@ export function MatchesPage() {
 
   const filteredMatches = useMemo(() => {
     if (!matches) return []
-    return matches.filter((m: any) => {
+    return matches.filter((m) => {
       const matchesSearch = search === '' ||
         m.vacancy?.title?.toLowerCase().includes(search.toLowerCase()) ||
         m.resume?.fullName?.toLowerCase().includes(search.toLowerCase())
@@ -73,7 +73,7 @@ export function MatchesPage() {
                 <SelectValue placeholder="Оберіть вакансію" />
               </SelectTrigger>
               <SelectContent>
-                {vacancies?.map((v: any) => (
+                {vacancies?.map((v) => (
                   <SelectItem key={v.id} value={v.id}>{v.title} — {v.company}</SelectItem>
                 ))}
               </SelectContent>
@@ -83,7 +83,7 @@ export function MatchesPage() {
                 <SelectValue placeholder="Оберіть резюме" />
               </SelectTrigger>
               <SelectContent>
-                {resumes?.map((r: any) => (
+                {resumes?.map((r) => (
                   <SelectItem key={r.id} value={r.id}>{r.fullName} — {r.position}</SelectItem>
                 ))}
               </SelectContent>
@@ -122,8 +122,8 @@ export function MatchesPage() {
       <div className="space-y-3">
         {filteredMatches.length > 0 ? (
           filteredMatches
-            .sort((a: any, b: any) => b.score - a.score)
-            .map((match: any) => (
+            .sort((a, b) => b.score - a.score)
+            .map((match) => (
               <Card key={match.id} className="hover:shadow-sm transition-shadow">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">

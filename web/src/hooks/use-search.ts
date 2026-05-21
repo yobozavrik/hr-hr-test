@@ -5,7 +5,7 @@ import { HrApiClient } from '@/lib/hr-api'
 
 function useHrClient() {
   const auth = useAuth()
-  return useMemo(() => new HrApiClient(() => auth.accessToken), [auth.accessToken])
+  return useMemo(() => new HrApiClient(() => auth.accessToken, 'web'), [auth.accessToken])
 }
 
 // Save vacancy to our database

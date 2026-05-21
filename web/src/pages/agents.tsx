@@ -73,11 +73,12 @@ function AgentChatPanel({ agentId, agentName, onClose }: { agentId: string; agen
         timestamp: new Date(),
       }
       setMessages(prev => [...prev, assistantMsg])
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Не вдалося отримати відповідь'
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `⚠️ Помилка: ${error.message || 'Не вдалося отримати відповідь'}`,
+        content: `⚠️ Помилка: ${message}`,
         timestamp: new Date(),
       }
       setMessages(prev => [...prev, errorMsg])
@@ -154,7 +155,7 @@ export function AgentsPage() {
   ])
 
   const [tasks, setTasks] = useState<AgentTask[]>([])
-  const [stats, setStats] = useState<any[]>([])
+  const [stats, setStats] = useState<Array<{ agentId: string; totalTasks: number; completedTasks: number; failedTasks: number; avgDurationMs: number }>>([])
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false)
   const [activeTask, setActiveTask] = useState<AgentTask | null>(null)
   const [selectedAgentId, setSelectedAgentId] = useState('marta')
@@ -169,7 +170,7 @@ export function AgentsPage() {
     const fetchDbData = async () => {
       try {
         const [dbTasks, dbStats] = await Promise.all([client.getAgentTasks(), client.getAgentStats()])
-        const mappedTasks = dbTasks.map((t: any) => ({
+        const mappedTasks = dbTasks.map((t) => ({
           id: t.id, agentId: t.agentId, taskTitle: t.taskTitle, status: t.status as any,
           inputParams: t.inputParams || '', outputResult: t.outputResult || '',
           durationMs: t.durationMs || undefined, createdAt: new Date(t.createdAt),

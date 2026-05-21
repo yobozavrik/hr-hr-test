@@ -32,7 +32,7 @@ export function VacanciesPage() {
 
   const filteredData = useMemo(() => {
     if (!data) return []
-    return data.filter((v: any) => {
+    return data.filter((v) => {
       const matchesSearch = search === '' ||
         v.title.toLowerCase().includes(search.toLowerCase()) ||
         v.company.toLowerCase().includes(search.toLowerCase())
@@ -166,7 +166,7 @@ export function VacanciesPage() {
       {/* Vacancy List */}
       <div className="space-y-3">
         {filteredData.length > 0 ? (
-          filteredData.map((vacancy: any) => (
+          filteredData.map((vacancy) => (
             <Card key={vacancy.id} className="hover:shadow-sm transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">

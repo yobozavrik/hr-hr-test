@@ -1,41 +1,11 @@
 import { Hono } from 'hono'
-import { z } from 'zod'
+import { zValidator } from '@hono/zod-validator'
+import { agentChatRequestSchema, matchAnalysisRequestSchema } from '@hr-recruiter/contracts'
 import { requireAuth } from '../auth/routes'
 import type { Variables } from '../app'
+import type { AppEnv } from '../env'
 import type { DbClient } from '../db'
 import { AGENT_CONFIGS, callFreeLLMAPI, type ChatMessage } from './agent-chat.service'
-
-const chatMessageSchema = z.object({
-  role: z.enum(['system', 'user', 'assistant']),
-  content: z.string(),
-})
-
-const chatRequestSchema = z.object({
-  agentId: z.string(),
-  messages: z.array(chatMessageSchema),
-  vacancyId: z.string().optional(),
-  resumeId: z.string().optional(),
-})
-
-const matchAnalysisSchema = z.object({
-  vacancy: z.object({
-    title: z.string(),
-    company: z.string().optional(),
-    location: z.string().optional(),
-    salaryFrom: z.number().optional(),
-    salaryTo: z.number().optional(),
-    description: z.string().optional(),
-    requirements: z.array(z.string()).optional(),
-  }),
-  resume: z.object({
-    fullName: z.string(),
-    position: z.string().optional(),
-    skills: z.array(z.string()).optional(),
-    experience: z.string().optional(),
-    education: z.string().optional(),
-    salary: z.string().optional(),
-  }),
-})
 
 export function createAgentChatRoutes(db: DbClient) {
   const app = new Hono<{ Variables: Variables }>()
@@ -49,16 +19,9 @@ export function createAgentChatRoutes(db: DbClient) {
   })
 
   // Chat with a specific agent
-  app.post('/chat', async (c) => {
+  app.post('/chat', zValidator('json', agentChatRequestSchema), async (c) => {
     const user = c.get('user')
-    const body = await c.req.json()
-
-    const parsed = chatRequestSchema.safeParse(body)
-    if (!parsed.success) {
-      return c.json({ error: 'INVALID_REQUEST', details: parsed.error.issues }, 400)
-    }
-
-    const { agentId, messages, vacancyId, resumeId } = parsed.data
+    const { agentId, messages, vacancyId, resumeId } = c.req.valid('json')
 
     const agent = AGENT_CONFIGS[agentId]
     if (!agent) {
@@ -75,7 +38,7 @@ export function createAgentChatRoutes(db: DbClient) {
     let contextNote = ''
     if (vacancyId) {
       try {
-        const vacancy = await (db as any).vacancy.findUnique({
+        const vacancy = await db.vacancy.findUnique({
           where: { id: vacancyId, userId: user.id },
         })
         if (vacancy) {
@@ -88,7 +51,7 @@ export function createAgentChatRoutes(db: DbClient) {
 
     if (resumeId) {
       try {
-        const resume = await (db as any).resume.findUnique({
+        const resume = await db.resume.findUnique({
           where: { id: resumeId, userId: user.id },
         })
         if (resume) {
@@ -107,7 +70,7 @@ export function createAgentChatRoutes(db: DbClient) {
     }
 
     try {
-      const env = c.env as any
+      const env = c.env as AppEnv
       const result = await callFreeLLMAPI(env, fullMessages)
 
       return c.json({
@@ -116,26 +79,20 @@ export function createAgentChatRoutes(db: DbClient) {
         content: result.content,
         provider: result.provider,
       })
-    } catch (error: any) {
+    } catch (error) {
       console.error('Agent chat error:', error)
+      const message = error instanceof Error ? error.message : 'Failed to get response from LLM'
       return c.json({
         error: 'LLM_ERROR',
-        message: error.message || 'Failed to get response from LLM',
+        message,
       }, 502)
     }
   })
 
   // Analyze match between vacancy and resume
-  app.post('/analyze-match', async (c) => {
+  app.post('/analyze-match', zValidator('json', matchAnalysisRequestSchema), async (c) => {
     const user = c.get('user')
-    const body = await c.req.json()
-
-    const parsed = matchAnalysisSchema.safeParse(body)
-    if (!parsed.success) {
-      return c.json({ error: 'INVALID_REQUEST', details: parsed.error.issues }, 400)
-    }
-
-    const { vacancy, resume } = parsed.data
+    const { vacancy, resume } = c.req.valid('json')
 
     const systemPrompt = `Ти експерт з рекрутингу з 15+ роками досвіду. Проаналізуй відповідність резюме вимогам вакансії.
 
@@ -185,11 +142,11 @@ export function createAgentChatRoutes(db: DbClient) {
     ]
 
     try {
-      const env = c.env as any
+      const env = c.env as AppEnv
       const result = await callFreeLLMAPI(env, messages)
 
       // Try to parse JSON from response
-      let parsedResult: any
+      let parsedResult: Record<string, unknown>
       try {
         const jsonMatch = result.content.match(/\{[\s\S]*\}/)
         if (jsonMatch) {
@@ -206,11 +163,12 @@ export function createAgentChatRoutes(db: DbClient) {
         rawContent: result.content,
         provider: result.provider,
       })
-    } catch (error: any) {
+    } catch (error) {
       console.error('Match analysis error:', error)
+      const message = error instanceof Error ? error.message : 'Failed to analyze match'
       return c.json({
         error: 'LLM_ERROR',
-        message: error.message || 'Failed to analyze match',
+        message,
       }, 502)
     }
   })

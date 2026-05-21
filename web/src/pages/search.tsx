@@ -16,6 +16,30 @@ import { Spinner } from '@/components/ui/spinner'
 import { Typography } from '@/components/ui/typography'
 import { Separator } from '@/components/ui/separator'
 
+interface SearchResultItem {
+  id: string
+  title: string
+  company?: string
+  candidateName?: string
+  location?: string
+  salaryFrom?: number
+  salaryTo?: number
+  currency?: string
+  description?: string
+  source: string
+  url?: string
+  skills?: string[]
+}
+
+interface MatchAnalysisResult {
+  score: number
+  verdict: string
+  summary: string
+  pros: string[]
+  cons: string[]
+  recommendations?: string[]
+}
+
 const SourceLogo = ({ source, className = "size-5" }: { source: string; className?: string }) => {
   switch (source) {
     case 'work.ua':
@@ -50,7 +74,7 @@ export function SearchPage() {
 
   const [activeAnalysisCardId, setActiveAnalysisCardId] = useState<string | null>(null)
   const [selectedMatchEntityId, setSelectedMatchEntityId] = useState<string>('')
-  const [matchAnalysisResult, setMatchAnalysisResult] = useState<any>(null)
+  const [matchAnalysisResult, setMatchAnalysisResult] = useState<MatchAnalysisResult | null>(null)
 
   const { data: results, isLoading, error } = useJobBoardSearch({
     text: searchText || ' ',
@@ -74,7 +98,7 @@ export function SearchPage() {
     setActiveAnalysisCardId(null)
   }
 
-  const handleSaveItem = (item: any) => {
+  const handleSaveItem = (item: SearchResultItem) => {
     if (searchType === 'vacancy') {
       saveVacancyMutation.mutate({
         title: item.title,
@@ -83,7 +107,7 @@ export function SearchPage() {
         salaryFrom: item.salaryFrom,
         salaryTo: item.salaryTo,
         currency: item.currency || 'UAH',
-        description: item.description,
+        description: item.description || '',
         source: item.source,
         sourceUrl: item.url,
       })
@@ -95,35 +119,35 @@ export function SearchPage() {
         salary: item.salaryFrom,
         currency: item.currency || 'UAH',
         skills: item.skills || [],
-        experience: item.description,
+        experience: item.description || '',
         source: item.source,
         sourceUrl: item.url,
       })
     }
   }
 
-  const handleStartAnalysis = (item: any) => {
+  const handleStartAnalysis = (item: SearchResultItem) => {
     setActiveAnalysisCardId(item.id)
     setMatchAnalysisResult(null)
     setSelectedMatchEntityId('')
   }
 
-  const executeAIAnalysis = (item: any) => {
+  const executeAIAnalysis = (item: SearchResultItem) => {
     if (!selectedMatchEntityId) return
 
-    let vacancyData: any
-    let resumeData: any
+    let vacancyData: { title: string; description: string }
+    let resumeData: { name: string; position: string; skills: string[]; experience?: string; education?: string }
 
     if (searchType === 'vacancy') {
-      const dbResume = savedResumes?.find((r: any) => r.id === selectedMatchEntityId)
+      const dbResume = savedResumes?.find((r) => r.id === selectedMatchEntityId)
       if (!dbResume) return
-      vacancyData = { title: item.title, description: item.description }
+      vacancyData = { title: item.title, description: item.description || '' }
       resumeData = { name: dbResume.fullName, position: dbResume.position, skills: dbResume.skills, experience: dbResume.experience || '', education: dbResume.education || '' }
     } else {
-      const dbVacancy = savedVacancies?.find((v: any) => v.id === selectedMatchEntityId)
+      const dbVacancy = savedVacancies?.find((v) => v.id === selectedMatchEntityId)
       if (!dbVacancy) return
-      vacancyData = { title: dbVacancy.title, description: dbVacancy.description }
-      resumeData = { name: item.candidateName || 'Шукач', position: item.title, skills: item.skills || [], experience: item.description, education: '' }
+      vacancyData = { title: dbVacancy.title, description: dbVacancy.description || '' }
+      resumeData = { name: item.candidateName || 'Шукач', position: item.title, skills: item.skills || [], experience: item.description || '', education: '' }
     }
 
     analyzeMatchMutation.mutate({ vacancy: vacancyData, resume: resumeData }, {
@@ -186,7 +210,7 @@ export function SearchPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Платформа</Label>
-                <Select value={selectedSource} onValueChange={(val: any) => setSelectedSource(val)}>
+                <Select value={selectedSource} onValueChange={(val) => setSelectedSource(val as typeof selectedSource)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Всі платформи" />
                   </SelectTrigger>
@@ -235,7 +259,7 @@ export function SearchPage() {
           </div>
 
           <div className="space-y-4">
-            {results.map((item: any) => {
+            {results.map((item: SearchResultItem) => {
               const isAnalyzing = activeAnalysisCardId === item.id
               const isSaved = searchType === 'vacancy'
                 ? saveVacancyMutation.isSuccess && saveVacancyMutation.variables?.sourceUrl === item.url
@@ -323,10 +347,10 @@ export function SearchPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                   {searchType === 'vacancy'
-                                    ? savedResumes?.map((res: any) => (
+                                    ? savedResumes?.map((res) => (
                                         <SelectItem key={res.id} value={res.id}>{res.fullName} ({res.position})</SelectItem>
                                       ))
-                                    : savedVacancies?.map((vac: any) => (
+                                    : savedVacancies?.map((vac) => (
                                         <SelectItem key={vac.id} value={vac.id}>{vac.title} - {vac.company}</SelectItem>
                                       ))
                                   }

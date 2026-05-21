@@ -4,6 +4,30 @@ import { zValidator } from '@hono/zod-validator'
 import { requireAuth } from '../auth/routes'
 import type { Variables } from '../app'
 import type { DbClient } from '../db'
+import type {
+  MartaTaskLog,
+  ArturTaskLog,
+  SofiaTaskLog,
+  DaniloTaskLog,
+  MaksymTaskLog,
+  OlenaTaskLog,
+} from '../generated/prisma/client'
+
+type AgentTaskLog =
+  | (MartaTaskLog & { agentId: string })
+  | (ArturTaskLog & { agentId: string })
+  | (SofiaTaskLog & { agentId: string })
+  | (DaniloTaskLog & { agentId: string })
+  | (MaksymTaskLog & { agentId: string })
+  | (OlenaTaskLog & { agentId: string })
+
+interface AgentStatRow {
+  agentId: string
+  totalTasks: number
+  completedTasks: number
+  failedTasks: number
+  avgDurationMs: number
+}
 
 const createTaskSchema = z.object({
   agentId: z.string(),
@@ -106,14 +130,13 @@ export function createAgentRoutes(db: DbClient) {
   }
 
   const getAgentDb = (agentId: string) => {
-    const client = db as any
     switch (agentId) {
-      case 'marta': return client.martaTaskLog
-      case 'artur': return client.arturTaskLog
-      case 'sofia': return client.sofiaTaskLog
-      case 'danilo': return client.daniloTaskLog
-      case 'maksym': return client.maksymTaskLog
-      case 'olena': return client.olenaTaskLog
+      case 'marta': return db.martaTaskLog
+      case 'artur': return db.arturTaskLog
+      case 'sofia': return db.sofiaTaskLog
+      case 'danilo': return db.daniloTaskLog
+      case 'maksym': return db.maksymTaskLog
+      case 'olena': return db.olenaTaskLog
       default: return null
     }
   }
@@ -125,7 +148,7 @@ export function createAgentRoutes(db: DbClient) {
     await refreshMaterializedView()
 
     try {
-      const stats: any = await db.$queryRawUnsafe(
+      const stats: AgentStatRow[] = await db.$queryRawUnsafe(
         `SELECT agent_id as "agentId", total_tasks as "totalTasks", completed_tasks as "completedTasks", failed_tasks as "failedTasks", avg_duration_ms as "avgDurationMs" FROM agent_efficiency_stats WHERE user_id = $1::uuid;`,
         user.id
       )
@@ -142,17 +165,17 @@ export function createAgentRoutes(db: DbClient) {
     const agentId = c.req.query('agentId')
     
     const agents = agentId ? [agentId] : ['marta', 'artur', 'sofia', 'danilo', 'maksym', 'olena']
-    const allTasks: any[] = []
+    const allTasks: AgentTaskLog[] = []
 
     for (const id of agents) {
       const agentDb = getAgentDb(id)
       if (agentDb) {
-        const tasks = await agentDb.findMany({
+        const tasks = await (agentDb as any).findMany({
           where: { userId: user.id },
           orderBy: { createdAt: 'desc' },
           take: 50,
         })
-        allTasks.push(...tasks.map((t: any) => ({ ...t, agentId: id })))
+        allTasks.push(...tasks.map((t: AgentTaskLog) => ({ ...t, agentId: id })))
       }
     }
 
@@ -173,7 +196,7 @@ export function createAgentRoutes(db: DbClient) {
       return c.json({ error: `Unknown agent: ${agentId}` }, 400)
     }
 
-    const task = await agentDb.create({
+    const task = await (agentDb as any).create({
       data: {
         userId: user.id,
         taskTitle,
@@ -198,7 +221,7 @@ export function createAgentRoutes(db: DbClient) {
       return c.json({ error: `Unknown agent: ${agentId}` }, 400)
     }
 
-    const task = await agentDb.updateMany({
+    const task = await (agentDb as any).updateMany({
       where: { id: taskId, userId: user.id },
       data: {
         status,
